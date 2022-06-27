@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#square {
+  width: 100px;
+  height: 100px;
+  background: black;
+}
+.hidden {
+  visibility:hidden;
+}
+</style>
+</head>
+<body>
+  <div id="square"></div>
+  
+  <button onclick="document.getElementById('square').style.display = 'none';">
+  display: none
+  </button>
+  
+  <button onclick="document.getElementById('square').remove()">
+  remove()
+  </button>
+  
+  <button onclick="document.getElementById('square').classList.add('hidden');">
+  hidden
+  </button>
+</body>
+</html>

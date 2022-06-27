@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.blacksq {
+  width: 100px;
+  height: 100px;
+  background: black;
+  float: left;
+  border-right: 10px solid white;
+  text-align: center;
+  color: white;
+}
+.redsq {
+  width: 50px;
+  height: 50px;
+  background: red;
+  float: left;
+  border-right: 10px solid white;
+  text-align: center;
+}
+.hidden {
+  visibility:hidden;
+}
+</style>
+</head>
+<body>
+  <div class="blacksq">.blacksq</div>
+  <div class="redsq">.redsq</div>
+  <div class="redsq">.redsq</div>
+  <div class="blacksq">.blacksq</div>
+  <div class="blacksq">.blacksq</div>
+    
+  <button for="selector" onclick="hideSelected(document.getElementById('selector').value)">
+  selector
+  </button>
+  <input type="text" id="selector">
+  
+  <script>
+    // actually rewritten hide()
+    function hide(el) {		
+		if (el.classList.contains('hidden')){
+			el.classList.remove('hidden');
+		}else el.classList.add('hidden');
+	}
+  
+    function hideAll(elements) {
+		for (let element of elements) {
+			hide(element);
+		}
+	}
+	
+	function hideSelected(selector) {
+		hideAll(document.querySelectorAll(selector));
+	}
+  </script>
+</body>
+</html>

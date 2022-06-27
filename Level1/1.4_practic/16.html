@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#box {
+  width: 100vmin;
+  height: 100vmin;
+  position: fixed;
+  background: rgba(100, 100, 100, 0.5);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+#boxButton {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+}
+
+.hidden {
+  visibility: hidden;
+}
+</style>
+</head>
+<body>
+  <div style="height: 2500px; background-image: linear-gradient(white, Orange);"></div>
+  <button id="boxButton" onclick="displayBox()">add Box</button>
+  <div id="box" class="hidden"></div>
+  
+  <script>
+    let box = document.getElementById("box");
+    box.addEventListener("click", boxFunction,true);
+	
+	let x;
+	let y;
+	let scrolling = false;
+	
+	window.onscroll = function() {stopScrolling(scrolling)};
+	
+	function boxFunction() {
+		addClass(box, 'hidden');
+		scrolling = false;
+	}
+    
+	function displayBox() {
+		removeClass(box, 'hidden');
+		x = window.scrollX;
+		y = window.scrollY;
+		scrolling = true;
+	}
+	
+	function addClass(el, cl) {
+		if (!el.classList.contains(cl)){
+			el.classList.add(cl);
+		}
+	}
+	
+	function removeClass(el, cl) {
+		if (el.classList.contains(cl)){
+			el.classList.remove(cl);
+		}
+	}
+	
+	function stopScrolling(flag){
+		if (flag) window.scrollTo(x, y);
+	}
+  </script>
+</body>
+</html>
