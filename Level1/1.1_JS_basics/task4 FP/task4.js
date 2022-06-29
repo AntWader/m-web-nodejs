@@ -25,5 +25,7 @@ let CSVParser = function (filepath) {
         )
 }
 
+// testing...
+
 par = new CSVParser('test.csv')
 console.log(par('Вінниця вінниця Вінниця'))

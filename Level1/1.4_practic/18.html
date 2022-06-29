@@ -1,41 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <style>
-#drop_zone {
+#uploader {
   border: 2px dashed #555;
   border-radius: 5px;
   background-color: rgba(163, 188, 201, 0.5);
   width:  400px;
   height: 200px;
-  padding: 15px;
-  margin: 20px;
+  margin: auto;  
 }
+#drop_zone {
+  width:  370px;
+  height: 170px;
+  padding: 15px;
+  position: fixed;
+}
+#status-bar {
+  width:  370px;
+  height: 145px;
+  margin: 40px 15px 15px 15px;
+  position: fixed;
+  text-align: center;
+}
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+#status-icon {
+  font-size:100px;
+  color: rgba(77, 103, 146, 0.5);
+}
+</style>
 </style>
 </head>
 <body>
-  <input type="file" id="drop_zone"></input>
-</div>
+  <div id="uploader">
+    <p id="status-bar">
+	<!-- Using Google icon. -->
+	<span  class="material-symbols-outlined" id="status-icon">
+	file_download
+	</span>
+	</p>
+	<input type="file" id="drop_zone" multiple="multiple" onchange="filesHandler(this.files)"></input>
+  </div>
 
 <script>
-uploader = document.getElementById('drop_zone');
+uploader = document.getElementById('uploader');
+input = document.getElementById('drop_zone');
+icon = document.getElementById('status-icon');
 
 // Adding prevent default handler to all the events.
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  uploader.addEventListener(eventName, preventDefaults, false)
+  input.addEventListener(eventName, preventDefaults, false)
 });
 
 // Restore default style properties values after file leave or already dropped.
-['dragleave', 'drop'].forEach(eventName => {
-  uploader.addEventListener(eventName, restoreStyle, false)
+['dragleave'].forEach(eventName => {
+  input.addEventListener(eventName, restoreStyle, false)
 });
 
 ['drop'].forEach(eventName => {
-  uploader.addEventListener(eventName, dropHandler, false)
+  input.addEventListener(eventName, dropHandler, false)
 });
 
 ['dragenter'].forEach(eventName => {
-  uploader.addEventListener(eventName, enterHandler, false)
+  input.addEventListener(eventName, enterHandler, false)
 });
 
 // Prevent default behavior (Prevent file from being opened).
@@ -45,32 +79,53 @@ function preventDefaults (ev) {
 }
 
 // Variable for storing style propertyes.
-let storage = {};
+let styleStorage = {};
+// Variable for storing icon type.
+let iconStorage = '';
 
 function enterHandler(ev) {
 	if (ev.dataTransfer.items){
-		let element = document.getElementById('drop_zone');
-		// Storing border property in storage variable.
-		storage = Object.assign(storage, window.getComputedStyle(element));
+		// Storing border property in stylestyleStorage variable.
+		styleStorage = Object.assign(styleStorage, window.getComputedStyle(uploader));
+				
 		let border = 5; // 5px
-		element.setAttribute('style',
-			`margin: ${
-				(parseInt(storage.margin, 10) + (parseInt(storage.border, 10) - border))}px; 
-				background-color: rgba(224, 170, 70, 0.5);`);
-		element.style.border = `${border}px dashed Orange`;
+		let borderShift = parseInt(styleStorage.border, 10) - border;
+		uploader.setAttribute('style',
+			`transform: translate(0px, ${borderShift}px); 
+			background-color: rgba(163, 188, 201, 0.25);
+			border: ${border}px dashed rgb(163, 188, 201);`);
+		
+		iconStorage = icon.innerHTML;
+		icon.innerHTML = 'add';
 	}
 }
 
 function restoreStyle(ev) {
 	// Overwrite style properties from the stored value.
-	document.getElementById('drop_zone').style = storage;
+	uploader.style = styleStorage;
+	// Overwrite icon type from the stored value.
+	icon.innerHTML = iconStorage;
 }
 
 function dropHandler(ev) {
 	console.log('File(s) dropped');
 
-	for (let i = 0; i < ev.dataTransfer.files.length; i++) {
-		console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
+	input.files = ev.dataTransfer.files;
+	filesHandler(ev.dataTransfer.files);
+	
+	let border = 4; // 5px
+		let borderShift = parseInt(styleStorage.border, 10) - border;
+		uploader.setAttribute('style',
+			`transform: translate(0px, ${borderShift}px); 
+			background-color: rgba(163, 188, 201, 0.5);
+			border: ${border}px dashed rgba(77, 103, 146, 0.5);`);
+	
+	icon.innerHTML = 'check';
+}
+
+function filesHandler(files) {
+	for (let i = 0; i < files.length; i++) {
+		console.log('... file[' + i + '].name = ' + files[i].name);
 	}
 }
 </script>
