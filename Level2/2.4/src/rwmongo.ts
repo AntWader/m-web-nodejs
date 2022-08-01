@@ -43,3 +43,8 @@ export async function getM(name: string) {
         console.log(e);
     }
 }
+
+// import { writeJSONtoF } from "./rwtofile";
+// import { readJSONfromF } from "./rwtofile";
+
+// writeM('data',readJSONfromF('../data.txt'));

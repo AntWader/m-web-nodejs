@@ -163,7 +163,13 @@ app.delete('/api/v1/items', jsonParser,
         console.log(responce);
     })
 
+    //import serveStatic from "serve-static";
+
+    import * as path from 'path';
+
+    app.use('/', express.static(path.join(__dirname, '../static/')))
+
 app.listen(port, () => {
-    console.log(`Example app listening on http://localhost:${port}/api`);
+    console.log(`Example app listening on http://localhost:${port}/frontend.html`);
     get();
 })

@@ -54,3 +54,6 @@ function getM(name) {
     });
 }
 exports.getM = getM;
+// import { writeJSONtoF } from "./rwtofile";
+// import { readJSONfromF } from "./rwtofile";
+// writeM('data',readJSONfromF('../data.txt'));
