@@ -1,21 +1,49 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const rwtofile_1 = require("./rwtofile");
-const rwtofile_2 = require("./rwtofile");
+// r/w to .txt file
+// import { writeJSONtoF } from "./rwtofile";
+// import { readJSONfromF } from "./rwtofile";
+// r/w to mongodb
+const rwmongo_1 = require("./rwmongo");
+const rwmongo_2 = require("./rwmongo");
 const app = (0, express_1.default)();
 const port = 3005;
 // create application/json parser
 let jsonParser = body_parser_1.default.json();
-let data = (0, rwtofile_2.readJSONfromF)('../data.txt');
-let id = (0, rwtofile_2.readJSONfromF)('../id.txt').currentId;
+// r/w to .txt file case
+// let data = readJSONfromF('../data.txt') as dataType;
+// let id: number = readJSONfromF('../id.txt').currentId;
+let data;
+let id;
+function get() {
+    return __awaiter(this, void 0, void 0, function* () {
+        data = (yield (0, rwmongo_2.getM)('data'));
+        id = (yield (0, rwmongo_2.getM)('lastId')).id;
+    });
+}
+// function update() {
+//   writeJSONtoF('../data.txt', data);
+//   writeJSONtoF('../id.txt', { currentId: id });
+// }
 function update() {
-    (0, rwtofile_1.writeJSONtoF)('../data.txt', data);
-    (0, rwtofile_1.writeJSONtoF)('../id.txt', { currentId: id });
+    return __awaiter(this, void 0, void 0, function* () {
+        yield (0, rwmongo_1.writeM)('data', data);
+        yield (0, rwmongo_1.writeM)('lastId', { id: id });
+    });
 }
 /**
  * Method to get item with unic id from array, and execute callback function if sucsess,
@@ -55,7 +83,7 @@ app.post('/api/v1/items', jsonParser, (req, res) => {
     let responce = { id: id };
     res.send(responce);
     console.log(responce);
-    update();
+    update(); //UPDATE
 });
 app.put('/api/v1/items', jsonParser, (req, res) => {
     console.log("put: ");
@@ -93,4 +121,5 @@ app.delete('/api/v1/items', jsonParser, (req, res) => {
 });
 app.listen(port, () => {
     console.log(`Example app listening on http://localhost:${port}/api`);
+    get();
 });

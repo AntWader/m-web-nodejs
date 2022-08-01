@@ -1,8 +1,13 @@
 import express from "express";
 import bodyParser from "body-parser";
 
-import { writeJSONtoF } from "./rwtofile";
-import { readJSONfromF } from "./rwtofile";
+// r/w to .txt file
+// import { writeJSONtoF } from "./rwtofile";
+// import { readJSONfromF } from "./rwtofile";
+
+// r/w to mongodb
+import { writeM } from "./rwmongo";
+import { getM } from "./rwmongo";
 
 const app = express()
 const port = 3005
@@ -13,15 +18,33 @@ let jsonParser = bodyParser.json()
 type itemType = { id: number, text: string, checked: boolean };
 
 type dataType = {
-  items: itemType[];
+    items: itemType[];
 } & Record<string, any>;
 
-let data = readJSONfromF('../data.txt') as dataType;
-let id: number = readJSONfromF('../id.txt').currentId;
+// r/w to .txt file case
+// function get() {
+//     data = readJSONfromF('../data.txt') as dataType;
+//     id = readJSONfromF('../id.txt').currentId as number;
+// }
 
-function update() {
-  writeJSONtoF('../data.txt', data);
-  writeJSONtoF('../id.txt', { currentId: id });
+let data: dataType;
+let id: number;
+
+// r/w to mongodb
+async function get() {
+    data = await getM('data') as dataType;
+    id = (await getM('lastId') as { id: number }).id;
+}
+
+// function update() {
+//   writeJSONtoF('../data.txt', data);
+//   writeJSONtoF('../id.txt', { currentId: id });
+// }
+
+// r/w to mongodb
+async function update() {
+    await writeM('data', data);
+    await writeM('lastId', { id: id })
 }
 
 /**
@@ -34,112 +57,113 @@ function update() {
  * @param err function to execute if item was not found
  */
 function getItem(arr: itemType[], id: number, action: (ind: number) => any, err: Function) {
-  let matchInd = -1;
+    let matchInd = -1;
 
-  arr.forEach((element, index) => {
-    if (element.id === id) {
-      matchInd = index;
-    }
-  });
+    arr.forEach((element, index) => {
+        if (element.id === id) {
+            matchInd = index;
+        }
+    });
 
-  if (matchInd >= 0) {
-    action(matchInd);
-  } else err();
+    if (matchInd >= 0) {
+        action(matchInd);
+    } else err();
 }
 
 //console.log(data.items);
 
 app.get('/api/v1/items', jsonParser, (req, res) => {
-  console.log("get: ");
-  console.log(req.body);
+    console.log("get: ");
+    console.log(req.body);
 
-  let responce = data;
+    let responce = data;
 
-  res.send(responce);
-  console.log(responce);
+    res.send(responce);
+    console.log(responce);
 })
 
 app.post('/api/v1/items', jsonParser,
-  (
-    req: { body: { text: itemType["text"] } } & Record<string, any>,
-    res
-  ) => {
-    console.log("post: ");
-    console.log(req.body);
+    (
+        req: { body: { text: itemType["text"] } } & Record<string, any>,
+        res
+    ) => {
+        console.log("post: ");
+        console.log(req.body);
 
-    id++;
-    data.items.push({ id: id, text: req.body.text, checked: true });
+        id++;
+        data.items.push({ id: id, text: req.body.text, checked: true });
 
-    let responce = { id: id };
+        let responce = { id: id };
 
-    res.send(responce);
-    console.log(responce);
+        res.send(responce);
+        console.log(responce);
 
-    update();
-  })
+        update(); //UPDATE
+    })
 
 app.put('/api/v1/items', jsonParser,
-  (
-    req: { body: itemType } & Record<string, any>,
-    res
-  ) => {
-    console.log("put: ");
-    console.log(req.body);
+    (
+        req: { body: itemType } & Record<string, any>,
+        res
+    ) => {
+        console.log("put: ");
+        console.log(req.body);
 
-    let responce;
+        let responce;
 
-    if (req.body.id > id || req.body.id < 0) {
-      res.send({ "ok": false });
-    } else {
-      getItem(
-        data.items,
-        req.body.id,
-        function (ind) {
-          data.items[ind] = req.body;
+        if (req.body.id > id || req.body.id < 0) {
+            res.send({ "ok": false });
+        } else {
+            getItem(
+                data.items,
+                req.body.id,
+                function (ind) {
+                    data.items[ind] = req.body;
 
-          responce = { "ok": true };
+                    responce = { "ok": true };
 
-          update(); //UPDATE
-        },
-        () => responce = { "ok": false }
-      );
-    }
+                    update(); //UPDATE
+                },
+                () => responce = { "ok": false }
+            );
+        }
 
-    res.send(responce);
-    console.log(responce);
-  })
+        res.send(responce);
+        console.log(responce);
+    })
 
 app.delete('/api/v1/items', jsonParser,
-  (
-    req: { body: { id: itemType["id"] } } & Record<string, any>,
-    res
-  ) => {
-    console.log("delete: ")
-    console.log(req.body)
+    (
+        req: { body: { id: itemType["id"] } } & Record<string, any>,
+        res
+    ) => {
+        console.log("delete: ")
+        console.log(req.body)
 
-    let responce;
+        let responce;
 
-    if (req.body.id > id || req.body.id < 0) {
-      res.send({ "ok": false })
-    } else {
-      getItem(
-        data.items,
-        req.body.id,
-        function (ind) {
-          delete data.items[ind];
+        if (req.body.id > id || req.body.id < 0) {
+            res.send({ "ok": false })
+        } else {
+            getItem(
+                data.items,
+                req.body.id,
+                function (ind) {
+                    delete data.items[ind];
 
-          responce = { "ok": true };
+                    responce = { "ok": true };
 
-          update(); //UPDATE
-        },
-        () => responce = { "ok": false }
-      );
-    }
+                    update(); //UPDATE
+                },
+                () => responce = { "ok": false }
+            );
+        }
 
-    res.send(responce);
-    console.log(responce);
-  })
+        res.send(responce);
+        console.log(responce);
+    })
 
 app.listen(port, () => {
-  console.log(`Example app listening on http://localhost:${port}/api`)
+    console.log(`Example app listening on http://localhost:${port}/api`);
+    get();
 })
