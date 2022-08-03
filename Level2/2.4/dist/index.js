@@ -138,7 +138,8 @@ app.delete('/api/v1/items', jsonParser, (req, res) => {
     }
     else {
         getItem(data.items, req.body.id, function (ind) {
-            delete data.items[ind];
+            //delete data.items[ind];
+            data.items.splice(ind, 1);
             responce = { "ok": true };
             update(); //UPDATE
         }, () => responce = { "ok": false });
