@@ -11,11 +11,17 @@ import MongoStore from 'connect-mongo'
 
 import { MongoRW } from "./rwmongo";
 
-const app = express()
-const port = 3005
+import * as path from 'path';
+
+
+const app = express();
+const port = 3005;
+
+// static frontend
+app.use('/', express.static(path.join(__dirname, '../static/')));
 
 // create application/json parser
-let jsonParser = bodyParser.json()
+let jsonParser = bodyParser.json();
 
 type itemType = { id: number, text: string, checked: boolean };
 
@@ -56,15 +62,15 @@ type storeType = {
     get: () => {}
 } & Record<string, any>;
 
-type contentType = { id: number, data: object } & Record<string, any>;
+type contentType = { id: number, data: dataType } & Record<string, any>;
 
 let storeMongo = (collection: string, login: string) => {
     return {
         set: async (content: object) => {
             await mongoRW.writeUsrData(collection, login, content);
         },
-        get: async () => {
-            return await mongoRW.getUsrData(collection, login);
+        get: async (): Promise<contentType> => {
+            return await mongoRW.getUsrData(collection, login) as contentType;
         }
     } as storeType
 }
@@ -74,10 +80,10 @@ let storeCookie = (session: { buffer?: object } & Record<string, any>) => {
         set: async (content: contentType) => {
             session.buffer = content;
         },
-        get: async () => {
+        get: async (): Promise<contentType> => {
             if (session.buffer) {
                 return session.buffer as contentType;
-            } else return { id: initId, data: initData };
+            } else return { id: initId, data: initData } as contentType;
         }
     } as storeType
 }
@@ -125,8 +131,14 @@ function getItem(arr: itemType[], id: number, action: (ind: number) => any, err:
 
 function get(session: { buffer?: object, login?: string } & Record<string, any>) {
     return session.login
-        ? storeMongo(dbStore, session.login).get()
-        : storeCookie(session).get()
+        ? storeMongo(dbStore, session.login).get() as Promise<contentType>
+        : storeCookie(session).get() as Promise<contentType>
+}
+
+function set(session: { buffer?: object, login?: string } & Record<string, any>, content: object) {
+    return session.login
+        ? storeMongo(dbStore, session.login).set(content)
+        : storeCookie(session).set(content)
 }
 
 app.get('/api/v1/items', jsonParser,
@@ -151,12 +163,19 @@ app.post('/api/v1/items', jsonParser,
         console.log(req.body);
         console.log(req.session);
 
-        id++;
-        data.items.push({ id: id, text: req.body.text, checked: true });
+        let post = (content: contentType): contentType => {
+            content.id++;
+            content.data.items.push({ id: content.id, text: req.body.text, checked: true });
 
-        responce(res, { id: id });
+            return { id: content.id, data: content.data } as contentType;
+        }
 
-        if (req.session.login != null) update(req.session.login, { id: 1, data: data }); //UPDATE
+        get(req.session).then((content: contentType) => {
+            let newContent = post(content);
+
+            set(req.session, newContent); //UPDATE usr data
+            responce(res, { id: newContent.id });
+        })
     })
 
 app.put('/api/v1/items', jsonParser,
@@ -168,22 +187,23 @@ app.put('/api/v1/items', jsonParser,
         console.log(req.body);
         console.log(req.session);
 
-        if (req.body.id > id || req.body.id < 0) {
-            responce(res, { "ok": false });
-        } else {
-            getItem(
-                data.items,
-                req.body.id,
-                function (ind) {
-                    data.items[ind] = req.body;
+        get(req.session).then((content: contentType) => {
+            if (req.body.id > content.id || req.body.id < 0) {
+                responce(res, { "ok": false });
+            } else {
+                getItem(
+                    content.data.items,
+                    req.body.id,
+                    function (ind) {
+                        content.data.items[ind] = req.body;
 
-                    responce(res, { "ok": true });
-
-                    if (req.session.login != null) update(req.session.login, { id: 1, data: data }); //UPDATE
-                },
-                () => responce(res, { "ok": false })
-            );
-        }
+                        set(req.session, content); //UPDATE usr data
+                        responce(res, { "ok": true });
+                    },
+                    () => responce(res, { "ok": false })
+                );
+            }
+        })
     })
 
 app.delete('/api/v1/items', jsonParser,
@@ -195,31 +215,24 @@ app.delete('/api/v1/items', jsonParser,
         console.log(req.body)
         console.log(req.session);
 
-        if (req.body.id > id || req.body.id < 0) {
-            res.send({ "ok": false })
-        } else {
-            getItem(
-                data.items,
-                req.body.id,
-                function (ind) {
-                    //delete data.items[ind];
-                    data.items.splice(ind, 1);
+        get(req.session).then((content: contentType) => {
+            if (req.body.id > content.id || req.body.id < 0) {
+                responce(res, { "ok": false });
+            } else {
+                getItem(
+                    content.data.items,
+                    req.body.id,
+                    function (ind) {
+                        content.data.items.splice(ind, 1);
 
-                    responce(res, { "ok": true });
-
-                    if (req.session.login != null) update(req.session.login, { id: 1, data: data }); //UPDATE
-                },
-                () => responce(res, { "ok": false })
-            );
-        }
+                        set(req.session, content); //UPDATE usr data
+                        responce(res, { "ok": true });
+                    },
+                    () => responce(res, { "ok": false })
+                );
+            }
+        })
     })
-
-//import serveStatic from "serve-static";
-
-import * as path from 'path';
-
-// static frontend
-app.use('/', express.static(path.join(__dirname, '../static/')));
 
 app.post('/api/v1/login', jsonParser,
     (
@@ -234,9 +247,7 @@ app.post('/api/v1/login', jsonParser,
                 req.session['login'] = req.body.login;
                 console.log(req.session);
 
-                // get data from mongodb
-                get(req.session.login)
-                    .then(() => responce(res, { ok: true }));
+                responce(res, { ok: true });
             } else responce(res, { ok: false });
         });
     })
@@ -250,8 +261,8 @@ app.post('/api/v1/logout', jsonParser,
         console.log(req.body);
 
         // JSON.parse(req.session.session).expires = new Date().toUTCString();
+        req.session.login = null;
         req.session.destroy();
-        refresh();
 
         responce(res, { ok: true })
     })
@@ -266,13 +277,12 @@ app.post('/api/v1/register', jsonParser,
 
         // add new user
         addUsr(req.body.login, req.body.pass)
-            .then(function (a) {
-                console.log(a);
+            .then(() => {
+                req.session['login'] = req.body.login;
 
                 // create user collections
-                update(req.body.login, { id: 1, data: data }).then(() => {
-                    responce(res, { ok: true });
-                });
+                set(req.session, { id: initId, data: initData });
+                responce(res, { ok: true });
             });
     })
 
