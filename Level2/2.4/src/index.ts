@@ -2,12 +2,12 @@ import express from "express";
 import bodyParser from "body-parser";
 
 // r/w to .txt file
-// import { writeJSONtoF } from "./rwtofile";
-// import { readJSONfromF } from "./rwtofile";
+import { writeJSONtoF } from "./rwtofile";
+import { readJSONfromF } from "./rwtofile";
 
 // r/w to mongodb
-import { writeM } from "./rwmongo";
-import { getM } from "./rwmongo";
+// import { writeM } from "./rwmongo";
+// import { getM } from "./rwmongo";
 
 const app = express()
 const port = 3005
@@ -22,30 +22,31 @@ type dataType = {
 } & Record<string, any>;
 
 // r/w to .txt file case
-// function get() {
-//     data = readJSONfromF('../data.txt') as dataType;
-//     id = readJSONfromF('../id.txt').currentId as number;
-// }
+function get() {
+    data = readJSONfromF('../data.txt') as dataType;
+    id = readJSONfromF('../id.txt').currentId as number;
+}
 
 let data: dataType;
 let id: number;
 
 // r/w to mongodb
-async function get() {
-    data = await getM('data') as dataType;
-    id = (await getM('lastId') as { id: number }).id;
-}
-
-// function update() {
-//   writeJSONtoF('../data.txt', data);
-//   writeJSONtoF('../id.txt', { currentId: id });
+// async function get() {
+//     data = await getM('data') as dataType;
+//     id = (await getM('lastId') as { id: number }).id;
 // }
 
-// r/w to mongodb
-async function update() {
-    await writeM('data', data);
-    await writeM('lastId', { id: id })
+// r/w to .txt file case
+function update() {
+  writeJSONtoF('../data.txt', data);
+  writeJSONtoF('../id.txt', { currentId: id });
 }
+
+// r/w to mongodb
+// async function update() {
+//     await writeM('data', data);
+//     await writeM('lastId', { id: id })
+// }
 
 /**
  * Method to get item with unic id from array, and execute callback function if sucsess,

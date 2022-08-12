@@ -9,51 +9,57 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getM = exports.writeM = exports.createM = void 0;
-const mongodb_1 = require("mongodb");
-const client = new mongodb_1.MongoClient("mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority");
-function createM(name, data) {
+exports.getUsrDataM = exports.writeUsrDataM = void 0;
+function writeUsrDataM(client, col, login, content) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield client.connect();
-            yield client.db().createCollection(name);
-            yield client.db().collection(name).insertOne(data);
-            client.close();
+            let collection = yield client.db().collection(col);
+            if ((yield collection.findOne()) == null) {
+                yield client.db().createCollection(col);
+                yield client.db().collection(col).insertOne({ login: login, content: content });
+            }
+            else {
+                if ((yield collection.findOne({ login: login })) == null) {
+                    yield collection.insertOne({ login: login, content: content });
+                }
+                else
+                    yield collection.replaceOne({ login: login }, { login: login, content: content });
+            }
+            yield client.close();
         }
         catch (e) {
             console.log(e);
         }
     });
 }
-exports.createM = createM;
-function writeM(name, data) {
+exports.writeUsrDataM = writeUsrDataM;
+function getUsrDataM(client, col, login) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield client.connect();
-            yield client.db().collection(name).replaceOne({}, data);
+            let parsed = yield client.db().collection(col).findOne({ login: login });
+            parsed = JSON.parse(JSON.stringify(parsed));
             client.close();
+            return parsed == null ? null : parsed.content;
         }
         catch (e) {
             console.log(e);
         }
     });
 }
-exports.writeM = writeM;
-function getM(name) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield client.connect();
-            let parsed = yield client.db().collection(name).findOne();
-            client.close();
-            delete parsed["_id"];
-            return parsed;
-        }
-        catch (e) {
-            console.log(e);
-        }
-    });
-}
-exports.getM = getM;
+exports.getUsrDataM = getUsrDataM;
+// const client = new MongoClient("mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority");
 // import { writeJSONtoF } from "./rwtofile";
 // import { readJSONfromF } from "./rwtofile";
-// writeM('data',readJSONfromF('../data.txt'));
+// getUsrDataM('usrData', 'admin').then(a => console.log(a));
+// writeUsrDataM('usrData', 'user', { "items": [{ "id": 0, "text": "BEST user", "cheaked": false }] });
+// async function addUsr(login: string, pass: string) {
+//     await writeUsrDataM('usrSecurity', login, { pass: pass });
+// }
+// async function checkUsr(login: string, pass: string) {
+//     let usr = await getUsrDataM('usrSecurity', login);
+//     return usr == null ? false : usr.pass === pass;
+// }
+//addUsr('admin', 'admin')
+//checkUsr('admin', 'admin').then(a => console.log(a));
