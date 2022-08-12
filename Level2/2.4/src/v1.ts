@@ -9,7 +9,7 @@ import session from 'express-session'
 import { MongoClient } from "mongodb";
 import MongoStore from 'connect-mongo'
 
-import { MongoRW } from "./rwmongo";
+import { writeUsrData, getUsrData } from "./rwmongo";
 
 import * as path from 'path';
 
@@ -29,9 +29,10 @@ type dataType = {
     items: itemType[];
 } & Record<string, any>;
 
-const client = new MongoClient("mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority");
+const mongoConnectString = "mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority";
 
-const mongoRW = new MongoRW(client);
+const client = new MongoClient(mongoConnectString);
+
 
 /**
  * The name of the collection for storing user data.
@@ -44,12 +45,12 @@ const dbStore = 'usrData';
 const dbSecurity = 'usrSecurity';
 
 async function checkUsr(login: string, pass: string) {
-    let usr = await mongoRW.getUsrData(dbSecurity, login);
+    let usr = await getUsrData(dbSecurity, login);
     return usr == null ? false : usr.pass === pass;
 }
 
 async function addUsr(login: string, pass: string) {
-    await mongoRW.writeUsrData(dbSecurity, login, { pass: pass });
+    await writeUsrData(dbSecurity, login, { pass: pass });
 }
 
 let responce = (res: any, a: object) => {
@@ -59,28 +60,17 @@ let responce = (res: any, a: object) => {
 
 type storeType = {
     set: (content: object) => {},
-    get: () => {}
+    get: () => Promise<contentType> | contentType
 } & Record<string, any>;
 
 type contentType = { id: number, data: dataType } & Record<string, any>;
 
-let storeMongo = (collection: string, login: string) => {
-    return {
-        set: async (content: object) => {
-            await mongoRW.writeUsrData(collection, login, content);
-        },
-        get: async (): Promise<contentType> => {
-            return await mongoRW.getUsrData(collection, login) as contentType;
-        }
-    } as storeType
-}
-
 let storeCookie = (session: { buffer?: object } & Record<string, any>) => {
     return {
-        set: async (content: contentType) => {
+        set: (content: contentType) => {
             session.buffer = content;
         },
-        get: async (): Promise<contentType> => {
+        get: (): contentType => {
             if (session.buffer) {
                 return session.buffer as contentType;
             } else return { id: initId, data: initData } as contentType;
@@ -129,33 +119,35 @@ function getItem(arr: itemType[], id: number, action: (ind: number) => any, err:
     } else err();
 }
 
-function get(session: { buffer?: object, login?: string } & Record<string, any>) {
+async function get(session: { buffer?: object, login?: string } & Record<string, any>) {
     return session.login
-        ? storeMongo(dbStore, session.login).get() as Promise<contentType>
-        : storeCookie(session).get() as Promise<contentType>
+        ? await getUsrData(dbStore, session.login) as contentType
+        : storeCookie(session).get() as contentType
 }
 
-function set(session: { buffer?: object, login?: string } & Record<string, any>, content: object) {
+async function set(session: { buffer?: object, login?: string } & Record<string, any>, content: object) {
     return session.login
-        ? storeMongo(dbStore, session.login).set(content)
+        ? await writeUsrData(dbStore, session.login, content)
         : storeCookie(session).set(content)
 }
 
 app.get('/api/v1/items', jsonParser,
-    (
+    async (
         req: { body: { text: itemType["text"] } } & Record<string, any>,
         res
     ) => {
         console.log("get: ");
         console.log(req.body);
         console.log(req.session);
-        console.log(req.session.login);
 
-        responce(res, get(req.session))
+        await get(req.session).then((content: contentType) => {
+            console.log(content);
+            responce(res, content.data);
+        })
     })
 
 app.post('/api/v1/items', jsonParser,
-    (
+    async (
         req: { body: { text: itemType["text"] } } & Record<string, any>,
         res
     ) => {
@@ -170,7 +162,7 @@ app.post('/api/v1/items', jsonParser,
             return { id: content.id, data: content.data } as contentType;
         }
 
-        get(req.session).then((content: contentType) => {
+        await get(req.session).then((content: contentType) => {
             let newContent = post(content);
 
             set(req.session, newContent); //UPDATE usr data
@@ -179,7 +171,7 @@ app.post('/api/v1/items', jsonParser,
     })
 
 app.put('/api/v1/items', jsonParser,
-    (
+    async (
         req: { body: itemType } & Record<string, any>,
         res
     ) => {
@@ -187,7 +179,7 @@ app.put('/api/v1/items', jsonParser,
         console.log(req.body);
         console.log(req.session);
 
-        get(req.session).then((content: contentType) => {
+        await get(req.session).then((content: contentType) => {
             if (req.body.id > content.id || req.body.id < 0) {
                 responce(res, { "ok": false });
             } else {
@@ -207,7 +199,7 @@ app.put('/api/v1/items', jsonParser,
     })
 
 app.delete('/api/v1/items', jsonParser,
-    (
+    async (
         req: { body: { id: itemType["id"] } } & Record<string, any>,
         res
     ) => {
@@ -215,7 +207,7 @@ app.delete('/api/v1/items', jsonParser,
         console.log(req.body)
         console.log(req.session);
 
-        get(req.session).then((content: contentType) => {
+        await get(req.session).then((content: contentType) => {
             if (req.body.id > content.id || req.body.id < 0) {
                 responce(res, { "ok": false });
             } else {
@@ -235,15 +227,15 @@ app.delete('/api/v1/items', jsonParser,
     })
 
 app.post('/api/v1/login', jsonParser,
-    (
+    async (
         req: { body: { login: string, pass: string } } & Record<string, any>,
         res
     ) => {
         console.log("post login: ");
         console.log(req.body);
 
-        checkUsr(req.body.login, req.body.pass).then(function (a) {
-            if (a) {
+        await checkUsr(req.body.login, req.body.pass).then(function (flag) {
+            if (flag) {
                 req.session['login'] = req.body.login;
                 console.log(req.session);
 
@@ -253,7 +245,7 @@ app.post('/api/v1/login', jsonParser,
     })
 
 app.post('/api/v1/logout', jsonParser,
-    (
+    async (
         req: { body: { login: string, pass: string } } & Record<string, any>,
         res
     ) => {
@@ -268,7 +260,7 @@ app.post('/api/v1/logout', jsonParser,
     })
 
 app.post('/api/v1/register', jsonParser,
-    (
+    async (
         req: { body: { login: string, pass: string } } & Record<string, any>,
         res
     ) => {
@@ -276,7 +268,7 @@ app.post('/api/v1/register', jsonParser,
         console.log(req.body);
 
         // add new user
-        addUsr(req.body.login, req.body.pass)
+        await addUsr(req.body.login, req.body.pass)
             .then(() => {
                 req.session['login'] = req.body.login;
 

@@ -1,1 +1,1 @@
-{"login":"admin","data":{"items":[{"id":1,"text":"hey!!!","cheaked":true},{"id":2,"text":"hey","checked":true},{"id":3,"text":"hey!!!","cheaked":true}]}}
+{"data":{"items":[{"id":1,"text":"hey!!!","cheaked":true},{"id":2,"text":"hey","checked":true},{"id":3,"text":"hey!!!","cheaked":true}]}}

@@ -9,10 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUsrDataM = exports.writeUsrDataM = void 0;
-function writeUsrDataM(client, col, login, content) {
+exports.getUsrData = exports.writeUsrData = void 0;
+const mongodb_1 = require("mongodb");
+const mongoConnectString = "mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority";
+function writeUsrData(col, login, content) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const client = new mongodb_1.MongoClient(mongoConnectString);
+            console.log(`Hey!!! ${col} ${login}:${JSON.stringify(content)}`);
             yield client.connect();
             let collection = yield client.db().collection(col);
             if ((yield collection.findOne()) == null) {
@@ -33,14 +37,18 @@ function writeUsrDataM(client, col, login, content) {
         }
     });
 }
-exports.writeUsrDataM = writeUsrDataM;
-function getUsrDataM(client, col, login) {
+exports.writeUsrData = writeUsrData;
+function getUsrData(col, login) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const client = new mongodb_1.MongoClient(mongoConnectString);
+            console.log(`Hey___ ${col} ${login}:`);
             yield client.connect();
             let parsed = yield client.db().collection(col).findOne({ login: login });
+            console.log(JSON.stringify(parsed)); //
             parsed = JSON.parse(JSON.stringify(parsed));
-            client.close();
+            console.log(JSON.stringify(parsed)); //
+            yield client.close();
             return parsed == null ? null : parsed.content;
         }
         catch (e) {
@@ -48,18 +56,4 @@ function getUsrDataM(client, col, login) {
         }
     });
 }
-exports.getUsrDataM = getUsrDataM;
-// const client = new MongoClient("mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority");
-// import { writeJSONtoF } from "./rwtofile";
-// import { readJSONfromF } from "./rwtofile";
-// getUsrDataM('usrData', 'admin').then(a => console.log(a));
-// writeUsrDataM('usrData', 'user', { "items": [{ "id": 0, "text": "BEST user", "cheaked": false }] });
-// async function addUsr(login: string, pass: string) {
-//     await writeUsrDataM('usrSecurity', login, { pass: pass });
-// }
-// async function checkUsr(login: string, pass: string) {
-//     let usr = await getUsrDataM('usrSecurity', login);
-//     return usr == null ? false : usr.pass === pass;
-// }
-//addUsr('admin', 'admin')
-//checkUsr('admin', 'admin').then(a => console.log(a));
+exports.getUsrData = getUsrData;

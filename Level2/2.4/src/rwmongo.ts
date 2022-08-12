@@ -1,100 +1,52 @@
 import { MongoClient } from "mongodb";
 
+const mongoConnectString = "mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority";
+
+
 type mongoDataType = Record<string, any> | null;
 
-// export async function writeUsrDataM(client: MongoClient, col: string, login: string, content: object) {
-//     try {
-//         await client.connect();
-//         let collection = await client.db().collection(col);
-//         if (await collection.findOne() == null) {
-//             await client.db().createCollection(col);
-//             await client.db().collection(col).insertOne({ login: login, content: content });
-//         } else {
-//             if (await collection.findOne({ login: login }) == null) {
-//                 await collection.insertOne({ login: login, content: content });
-//             } else await collection.replaceOne({ login: login }, { login: login, content: content });
-//         }
+export async function writeUsrData(col: string, login: string, content: object) {
+    try {
+        const client = new MongoClient(mongoConnectString);
 
-//         await client.close();
-//     } catch (e) {
-//         console.log(e);
-//     }
-// }
+        console.log(`Hey!!! ${col} ${login}:${JSON.stringify(content)}`)
+        
+        await client.connect();
+        let collection = await client.db().collection(col);
 
-// export async function getUsrDataM(client: MongoClient, col: string, login: string) {
-//     try {
-//         await client.connect();
-
-//         let parsed = await client.db().collection(col).findOne({ login: login }) as mongoDataType;
-//         parsed = JSON.parse(JSON.stringify(parsed));
-
-//         client.close();
-
-//         return parsed == null ? null : parsed.content as mongoDataType;
-//     } catch (e) {
-//         console.log(e);
-//     }
-// }
-
-
-export class MongoRW {
-    client: MongoClient;
-
-    constructor(client: MongoClient) {
-        this.client = client;
-    }
-
-    async writeUsrData(col: string, login: string, content: object) {
-        try {
-            await this.client.connect();
-            let collection = await this.client.db().collection(col);
-            if (await collection.findOne() == null) {
-                await this.client.db().createCollection(col);
-                await this.client.db().collection(col).insertOne({ login: login, content: content });
-            } else {
-                if (await collection.findOne({ login: login }) == null) {
-                    await collection.insertOne({ login: login, content: content });
-                } else await collection.replaceOne({ login: login }, { login: login, content: content });
-            }
-    
-            await this.client.close();
-        } catch (e) {
-            console.log(e);
+        if (await collection.findOne() == null) {
+            await client.db().createCollection(col);
+            await client.db().collection(col).insertOne({ login: login, content: content });
+        } else {
+            if (await collection.findOne({ login: login }) == null) {
+                await collection.insertOne({ login: login, content: content });
+            } else await collection.replaceOne({ login: login }, { login: login, content: content });
         }
-    }
 
-    async getUsrData(col: string, login: string) {
-        try {
-            await this.client.connect();
-    
-            let parsed = await this.client.db().collection(col).findOne({ login: login }) as mongoDataType;
-            parsed = JSON.parse(JSON.stringify(parsed));
-    
-            this.client.close();
-    
-            return parsed == null ? null : parsed.content as mongoDataType;
-        } catch (e) {
-            console.log(e);
-        }
+        await client.close();
+    } catch (e) {
+        console.log(e);
     }
 }
-// const client = new MongoClient("mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority");
 
-// import { writeJSONtoF } from "./rwtofile";
-// import { readJSONfromF } from "./rwtofile";
+export async function getUsrData(col: string, login: string) {
+    try {
+        const client = new MongoClient(mongoConnectString);
 
-// getUsrDataM('usrData', 'admin').then(a => console.log(a));
-// writeUsrDataM('usrData', 'user', { "items": [{ "id": 0, "text": "BEST user", "cheaked": false }] });
+        console.log(`Hey___ ${col} ${login}:`)
 
-// async function addUsr(login: string, pass: string) {
-//     await writeUsrDataM('usrSecurity', login, { pass: pass });
-// }
+        await client.connect();
 
-// async function checkUsr(login: string, pass: string) {
-//     let usr = await getUsrDataM('usrSecurity', login);
-//     return usr == null ? false : usr.pass === pass;
-// }
+        let parsed = await client.db().collection(col).findOne({ login: login }) as mongoDataType;
+        console.log(JSON.stringify(parsed)); //
+        parsed = JSON.parse(JSON.stringify(parsed));
 
-//addUsr('admin', 'admin')
+        console.log(JSON.stringify(parsed)); //
 
-//checkUsr('admin', 'admin').then(a => console.log(a));
+        await client.close();
+
+        return parsed == null ? null : parsed.content as mongoDataType;
+    } catch (e) {
+        console.log(e);
+    }
+}
