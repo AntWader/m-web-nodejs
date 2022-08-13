@@ -16,7 +16,6 @@ function writeUsrData(col, login, content) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const client = new mongodb_1.MongoClient(mongoConnectString);
-            console.log(`Hey!!! ${col} ${login}:${JSON.stringify(content)}`);
             yield client.connect();
             let collection = yield client.db().collection(col);
             if ((yield collection.findOne()) == null) {
@@ -42,12 +41,10 @@ function getUsrData(col, login) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const client = new mongodb_1.MongoClient(mongoConnectString);
-            console.log(`Hey___ ${col} ${login}:`);
             yield client.connect();
             let parsed = yield client.db().collection(col).findOne({ login: login });
             console.log(JSON.stringify(parsed)); //
             parsed = JSON.parse(JSON.stringify(parsed));
-            console.log(JSON.stringify(parsed)); //
             yield client.close();
             return parsed == null ? null : parsed.content;
         }

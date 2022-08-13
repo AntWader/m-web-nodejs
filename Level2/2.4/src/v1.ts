@@ -133,17 +133,22 @@ async function set(session: { buffer?: object, login?: string } & Record<string,
 
 app.get('/api/v1/items', jsonParser,
     async (
-        req: { body: { text: itemType["text"] } } & Record<string, any>,
+        req: Record<string, any>,
         res
     ) => {
         console.log("get: ");
         console.log(req.body);
         console.log(req.session);
 
-        await get(req.session).then((content: contentType) => {
-            console.log(content);
-            responce(res, content.data);
-        })
+        try {
+            await get(req.session).then((content: contentType) => {
+                console.log(content);
+                responce(res, content.data);
+            })
+        } catch (e) {
+            console.log(e);
+            res.status(500).send({ error: "...." });
+        }
     })
 
 app.post('/api/v1/items', jsonParser,
@@ -162,12 +167,19 @@ app.post('/api/v1/items', jsonParser,
             return { id: content.id, data: content.data } as contentType;
         }
 
-        await get(req.session).then((content: contentType) => {
-            let newContent = post(content);
+        if (req.body.text) { // walidating
+            try {
+                await get(req.session).then((content: contentType) => {
+                    let newContent = post(content);
 
-            set(req.session, newContent); //UPDATE usr data
-            responce(res, { id: newContent.id });
-        })
+                    set(req.session, newContent); //UPDATE usr data
+                    responce(res, { id: newContent.id });
+                })
+            } catch (e) {
+                console.log(e);
+                res.status(500).send({ error: "...." }); //ERROR 500 server error
+            }
+        } else res.status(400).send({ error: "...." }); //ERROR 400 Bad Request
     })
 
 app.put('/api/v1/items', jsonParser,
@@ -179,23 +191,30 @@ app.put('/api/v1/items', jsonParser,
         console.log(req.body);
         console.log(req.session);
 
-        await get(req.session).then((content: contentType) => {
-            if (req.body.id > content.id || req.body.id < 0) {
-                responce(res, { "ok": false });
-            } else {
-                getItem(
-                    content.data.items,
-                    req.body.id,
-                    function (ind) {
-                        content.data.items[ind] = req.body;
+        if (req.body.id && req.body.text && req.body.checked != undefined) { // walidating
+            try {
+                await get(req.session).then((content: contentType) => {
+                    if (req.body.id > content.id || req.body.id < 0) {
+                        responce(res, { "ok": false });
+                    } else {
+                        getItem(
+                            content.data.items,
+                            req.body.id,
+                            function (ind) {
+                                content.data.items[ind] = req.body;
 
-                        set(req.session, content); //UPDATE usr data
-                        responce(res, { "ok": true });
-                    },
-                    () => responce(res, { "ok": false })
-                );
+                                set(req.session, content); //UPDATE usr data
+                                responce(res, { "ok": true });
+                            },
+                            () => responce(res, { "ok": false })
+                        );
+                    }
+                })
+            } catch (e) {
+                console.log(e);
+                res.status(500).send({ error: "...." }); //ERROR 500 server error
             }
-        })
+        } else res.status(400).send({ error: "...." }); //ERROR 400 Bad Request
     })
 
 app.delete('/api/v1/items', jsonParser,
@@ -207,23 +226,30 @@ app.delete('/api/v1/items', jsonParser,
         console.log(req.body)
         console.log(req.session);
 
-        await get(req.session).then((content: contentType) => {
-            if (req.body.id > content.id || req.body.id < 0) {
-                responce(res, { "ok": false });
-            } else {
-                getItem(
-                    content.data.items,
-                    req.body.id,
-                    function (ind) {
-                        content.data.items.splice(ind, 1);
+        if (req.body.id) { // walidating
+            try {
+                await get(req.session).then((content: contentType) => {
+                    if (req.body.id > content.id || req.body.id < 0) {
+                        responce(res, { "ok": false });
+                    } else {
+                        getItem(
+                            content.data.items,
+                            req.body.id,
+                            function (ind) {
+                                content.data.items.splice(ind, 1);
 
-                        set(req.session, content); //UPDATE usr data
-                        responce(res, { "ok": true });
-                    },
-                    () => responce(res, { "ok": false })
-                );
+                                set(req.session, content); //UPDATE usr data
+                                responce(res, { "ok": true });
+                            },
+                            () => responce(res, { "ok": false })
+                        );
+                    }
+                })
+            } catch (e) {
+                console.log(e);
+                res.status(500).send({ error: "...." }); //ERROR 500 server error
             }
-        })
+        } else res.status(400).send({ error: "...." }); //ERROR 400 Bad Request
     })
 
 app.post('/api/v1/login', jsonParser,
@@ -234,29 +260,40 @@ app.post('/api/v1/login', jsonParser,
         console.log("post login: ");
         console.log(req.body);
 
-        await checkUsr(req.body.login, req.body.pass).then(function (flag) {
-            if (flag) {
-                req.session['login'] = req.body.login;
-                console.log(req.session);
+        if (req.body.login && req.body.pass) { // walidating
+            try {
+                await checkUsr(req.body.login, req.body.pass).then(function (flag) {
+                    if (flag) {
+                        req.session['login'] = req.body.login;
+                        console.log(req.session);
 
-                responce(res, { ok: true });
-            } else responce(res, { ok: false });
-        });
+                        responce(res, { ok: true });
+                    } else responce(res, { ok: false });
+                })
+            } catch (e) {
+                console.log(e);
+                res.status(500).send({ error: "...." }); //ERROR 500 server error
+            }
+        } else res.status(400).send({ error: "...." }); //ERROR 400 Bad Request
     })
 
 app.post('/api/v1/logout', jsonParser,
     async (
-        req: { body: { login: string, pass: string } } & Record<string, any>,
+        req: Record<string, any>,
         res
     ) => {
         console.log("post logout: ");
         console.log(req.body);
 
-        // JSON.parse(req.session.session).expires = new Date().toUTCString();
-        req.session.login = null;
-        req.session.destroy();
+        try {
+            req.session.login = null;
+            req.session.destroy();
 
-        responce(res, { ok: true })
+            responce(res, { ok: true })
+        } catch (e) {
+            console.log(e);
+            res.status(500).send({ error: "...." }); //ERROR 500 server error
+        }     
     })
 
 app.post('/api/v1/register', jsonParser,
@@ -267,15 +304,21 @@ app.post('/api/v1/register', jsonParser,
         console.log("post register: ");
         console.log(req.body);
 
-        // add new user
-        await addUsr(req.body.login, req.body.pass)
-            .then(() => {
+        if (req.body.login && req.body.pass) { // walidating
+            try {
+                // add new user
+                await addUsr(req.body.login, req.body.pass)
+
                 req.session['login'] = req.body.login;
 
                 // create user collections
-                set(req.session, { id: initId, data: initData });
+                await set(req.session, { id: initId, data: initData });
                 responce(res, { ok: true });
-            });
+            } catch (e) {
+                console.log(e);
+                res.status(500).send({ error: "...." }); //ERROR 500 server error
+            }
+        } else res.status(400).send({ error: "...." }); //ERROR 400 Bad Request
     })
 
 app.listen(port, () => {
