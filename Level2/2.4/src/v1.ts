@@ -1,10 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
 
-// r/w to mongodb
-// import { writeUsrDataM } from "./rwmongo";
-// import { getUsrDataM } from "./rwmongo";
-
 import session from 'express-session'
 import { MongoClient } from "mongodb";
 import MongoStore from 'connect-mongo'
