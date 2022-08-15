@@ -43,10 +43,27 @@ const connect_mongo_1 = __importDefault(require("connect-mongo"));
 const rwmongo_1 = require("./rwmongo");
 const path = __importStar(require("path"));
 const querystring_1 = __importDefault(require("querystring"));
+// import * as cors from 'cors';
+var cors = require('cors');
 const app = (0, express_1.default)();
 const port = 3005;
 // static frontend
 app.use('/', express_1.default.static(path.join(__dirname, '../static/')));
+let corsOptions = {
+    allowedHeaders: [
+        'Origin',
+        'X-Requested-With',
+        'Content-Type',
+        'Accept',
+        'X-Access-Token',
+    ],
+    credentials: true,
+    methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+    origin: 'http://localhost:8080',
+    preflightContinue: false,
+};
+// cors frontend
+app.use(cors(corsOptions));
 // create application/json parser
 let jsonParser = body_parser_1.default.json();
 const mongoConnectString = "mongodb+srv://user:d2nswPs7tZySH6Ww@cluster0.vnoij.mongodb.net/?retryWrites=true&w=majority";

@@ -11,12 +11,33 @@ import * as path from 'path';
 
 import querystring from 'querystring';
 
+// import * as cors from 'cors';
+var cors = require('cors')
+
 
 const app = express();
 const port = 3005;
 
 // static frontend
 app.use('/', express.static(path.join(__dirname, '../static/')));
+
+
+let corsOptions = {
+    allowedHeaders: [
+        'Origin',
+        'X-Requested-With',
+        'Content-Type',
+        'Accept',
+        'X-Access-Token',
+    ],
+    credentials: true,
+    methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+    origin: 'http://localhost:8080',
+    preflightContinue: false,
+}
+
+// cors frontend
+app.use(cors(corsOptions));
 
 // create application/json parser
 let jsonParser = bodyParser.json();
