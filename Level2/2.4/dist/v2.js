@@ -185,54 +185,91 @@ let methods = {
     }),
     getItems: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         console.log(`getItems: ${req.body}, session: ${req.session}`);
-        yield get(req.session).then((content) => {
-            console.log(content);
-            responce(res, content.data);
-        });
+        let content = yield get(req.session);
+        console.log(content);
+        responce(res, content.data);
+        // await get(req.session).then((content: contentType) => {
+        //     console.log(content);
+        //     responce(res, content.data);
+        // })
     }),
     deleteItem: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        yield get(req.session).then((content) => {
-            if (req.body.id > content.id || req.body.id < 0) {
-                responce(res, { "ok": false });
-            }
-            else {
-                getItem(content.data.items, req.body.id, function (ind) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        content.data.items.splice(ind, 1);
-                        yield set(req.session, content); //UPDATE usr data
-                        responce(res, { "ok": true });
-                    });
-                }, () => responce(res, { "ok": false }));
-            }
-        });
+        let content = yield get(req.session);
+        if (req.body.id > content.id || req.body.id < 0) {
+            responce(res, { "ok": false });
+        }
+        else {
+            getItem(content.data.items, req.body.id, function (ind) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    content.data.items.splice(ind, 1);
+                    yield set(req.session, content); //UPDATE usr data
+                    responce(res, { "ok": true });
+                });
+            }, () => responce(res, { "ok": false }));
+        }
+        // await get(req.session).then((content: contentType) => {
+        //     if (req.body.id > content.id || req.body.id < 0) {
+        //         responce(res, { "ok": false });
+        //     } else {
+        //         getItem(
+        //             content.data.items,
+        //             req.body.id,
+        //             async function (ind) {
+        //                 content.data.items.splice(ind, 1);
+        //                 await set(req.session, content); //UPDATE usr data
+        //                 responce(res, { "ok": true });
+        //             },
+        //             () => responce(res, { "ok": false })
+        //         );
+        //     }
+        // })
     }),
     addItem: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         let post = (content) => {
             content.id++;
-            content.data.items.push({ id: content.id, text: req.body.text, checked: true });
+            content.data.items.push({ id: content.id, text: req.body.text, checked: false });
             return { id: content.id, data: content.data };
         };
-        yield get(req.session).then((content) => __awaiter(void 0, void 0, void 0, function* () {
-            let newContent = post(content);
-            yield set(req.session, newContent); //UPDATE usr data
-            responce(res, { id: newContent.id });
-        }));
+        let content = yield get(req.session);
+        let newContent = post(content);
+        yield set(req.session, newContent); //UPDATE usr data
+        responce(res, { id: newContent.id });
+        // await get(req.session).then(async (content: contentType) => {
+        //     let newContent = post(content);
+        //     await set(req.session, newContent); //UPDATE usr data
+        //     responce(res, { id: newContent.id });
+        // })
     }),
     editItem: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        yield get(req.session).then((content) => {
-            if (req.body.id > content.id || req.body.id < 0) {
-                responce(res, { "ok": false });
-            }
-            else {
-                getItem(content.data.items, req.body.id, function (ind) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        content.data.items[ind] = req.body;
-                        yield set(req.session, content); //UPDATE usr data
-                        responce(res, { "ok": true });
-                    });
-                }, () => responce(res, { "ok": false }));
-            }
-        });
+        let content = yield get(req.session);
+        if (req.body.id > content.id || req.body.id < 0) {
+            responce(res, { "ok": false });
+        }
+        else {
+            getItem(content.data.items, req.body.id, function (ind) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    content.data.items[ind] = req.body;
+                    yield set(req.session, content); //UPDATE usr data
+                    responce(res, { "ok": true });
+                });
+            }, () => responce(res, { "ok": false }));
+        }
+        // await get(req.session).then((content: contentType) => {
+        //     if (req.body.id > content.id || req.body.id < 0) {
+        //         responce(res, { "ok": false });
+        //     } else {
+        //         getItem(
+        //             content.data.items,
+        //             req.body.id,
+        //             async function (ind) {
+        //                 content.data.items[ind] = req.body;
+        //                 await set(req.session, content); //UPDATE usr data
+        //                 responce(res, { "ok": true });
+        //             },
+        //             () => responce(res, { "ok": false })
+        //         );
+        //     }
+        // })
     })
 };
 app.post('*', jsonParser, function (req, res) {

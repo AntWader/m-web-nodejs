@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>2.4.1_Astound</title>
+
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+    main {
+      width: 772px;
+      margin: 25px auto;
+    }
+
+    header {
+      border-bottom: 5px solid #e4dcc2;
+    }
+
+    button {
+      cursor: pointer;
+      margin: 0;
+      padding: 0px 0px 2px 0px;
+      border: 1px solid rgb(51, 48, 48);
+      background: none;
+    }
+
+    .add_todo_input {
+      width: 100%;
+      border: none;
+      border-color: transparent;
+      border-bottom: 1px solid rgb(51, 48, 48);
+    }
+
+    .input_span {
+      display: block;
+      overflow: hidden;
+    }
+
+    .add_todo_button {
+      float: right;
+    }
+
+    .interface_todos {
+      background-color: rgba(186, 194, 199, 0.5);
+      padding: 25px;
+    }
+
+    .todo {
+      border-bottom: 1px solid rgb(51, 48, 48);
+    }
+
+    .button_edit_todo {
+      margin: 0;
+      padding: 1px;
+      border: 0;
+      background: none;
+      font-size: 25px;
+    }
+
+    .button_edit_todo:hover {
+      padding: 0px;
+      border: 1px solid rgb(51, 48, 48);
+      border-radius: 4px;
+    }
+
+    .checked {
+      text-decoration: line-through;
+    }
+
+    .logout_button {
+      width: 100%;
+    }
+
+    .login {
+      width: 50%;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .login_button {
+      width: 50%;
+    }
+
+    .login_input {
+      width: 50%;
+    }
+
+    .material-symbols-outlined {
+      font-size: 24px;
+      vertical-align: middle;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 48
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <header class="header">
+      <h1 class="logo"><span style="color:rgb(133, 148, 140)">LOGO</span></h1>
+    </header>
+
+    <main class="interface_todos">
+      <div v-if="step == 'todos'">
+        <form @submit.prevent="addTodo">
+          <button class="add_todo_button">Add Todo</button>
+          <span class="input_span">
+            <input class="add_todo_input" type="text" v-model="newTodo.text">
+          </span>
+        </form>
+        <ul>
+          <p v-if="!filteredTodos">Loading...</p>
+          <p v-else>
+          <div class="todo" v-for="(todo, index) in filteredTodos" :key="index">
+            <div v-if="todo.id == editTodo.id">
+              <input type="checkbox" v-model="editTodo.checked">
+              <span :class="{ checked: todo.checked }">{{ index+1 }}.</span>
+              <input v-model="editTodo.text" @keyup.enter="updateTodos(editTodo)" autofocus>
+              <button class="button_edit_todo" @click="updateTodos(editTodo)">
+                <span class="material-symbols-outlined"> done </span>
+              </button>
+              <button class="button_edit_todo" @click="editTodo = {}">
+                <span class="material-symbols-outlined"> undo </span>
+              </button>
+            </div>
+            <div v-else>
+              <input type="checkbox" v-model="todo.checked" @change="updateTodos(todo)">
+              <span :class="{ checked: todo.checked }">{{ index + 1 }}. {{ todo.text }}</span>
+              <button class="button_edit_todo" @click="editTodo = JSON.parse(JSON.stringify(todo))">
+                <span class="material-symbols-outlined"> edit </span>
+              </button>
+              <button class="button_edit_todo" @click="removeTodo(todo)">
+                <span class="material-symbols-outlined"> close </span>
+              </button>
+            </div>
+          </div>
+          </p>
+        </ul>
+        <button @click="hideCompleted = !hideCompleted">
+          {{ hideCompleted ? 'Show all' : 'Hide completed' }}
+        </button>
+
+        <div class="logout_button">
+          <button @click="logOut">Logout</button>
+        </div>
+      </div>
+      <div v-else-if="step == 'login'">
+        <div class="login">
+          <input class="login_input" v-model="login" type="text" placeholder="login" autofocus required>
+          <input class="login_input" v-model="pass" type="password" placeholder="****" autofocus required>
+        </div>
+        <div class="login">
+          <button class="login_button" @click="register">Register/Rewrite User</button>
+          <button class="login_button" @click="logIn" class="primary">Login</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let id = 0
+
+    let fetchV2Json = (apiURL, qs, req) =>
+      fetch(apiURL + 'v2/router?' + new URLSearchParams(qs), {
+        method: 'POST',
+        body: req,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }).then(res => res.json())
+
+    let vue = new Vue({
+      el: '#app',
+      data: {
+        newTodo: {
+          id: null,
+          text: '',
+          checked: false
+        },
+        editTodo: {},
+        hideCompleted: false,
+        todos: [],
+        login: '',
+        pass: '',
+        step: 'todos', // start from shoving todos
+        apiURL: 'http://localhost:3005/api/',
+        // apiVersion: 'v2'
+      },
+      computed: {
+        filteredTodos() {
+          return !this.todos
+            ? null
+            : this.hideCompleted
+              ? this.todos.filter((t) => !t.checked)
+              : this.todos
+        }
+      },
+      mounted() { // starts app from fetching todos
+        this.getTodos();
+      },
+      methods: {
+        addTodo: function () {
+          if (this.newTodo.text.trim() !== '') {
+            let request = JSON.stringify({ text: this.newTodo.text });
+            const qs = { action: 'addItem' };
+
+            fetchV2Json(this.apiURL, qs, request)
+              .then((response) => {
+                if (response.id) {
+                  this.getTodos();
+                } else {
+                  this.step = 'error';
+                }
+              })
+          }
+
+          this.newTodo.text = '';
+        },
+        removeTodo: function (todo) {
+          let request = JSON.stringify({ id: todo.id });
+          const qs = { action: 'deleteItem' };
+
+          fetchV2Json(this.apiURL, qs, request)
+            .then((response) => {
+              if (response['ok'] === true) {
+                this.getTodos();
+              } else {
+                this.step = 'error';
+              }
+            })
+        },
+        getTodos: function () {
+          this.todos = null
+
+          const qs = { action: 'getItems' };
+
+          fetchV2Json(this.apiURL, qs, '')
+            .then((response) => {
+              if (response.error === 'forbidden') {
+                this.step = 'login';
+              } else {
+                this.todos = response.items;
+
+                this.step = 'todos';
+              }
+            }).catch((error) => {
+              this.step = 'error';
+            })
+        },
+        updateTodos: function (todo) {
+          let request = JSON.stringify({ id: todo.id, text: todo.text, checked: todo.checked });
+          const qs = { action: 'editItem' };
+
+          this.editTodo = {};
+
+          fetchV2Json(this.apiURL, qs, request)
+            .then(() => {
+              this.getTodos();
+            });
+        },
+        register: function () {
+          if (this.login.trim() !== '' && this.pass.trim()) {
+            let request = JSON.stringify({ login: this.login, pass: this.pass });
+            const qs = { action: 'register' };
+
+            fetchV2Json(this.apiURL, qs, request)
+              .then((response) => {
+                if (response['ok'] === true) {
+                  this.logIn();
+                } else {
+                  this.step = 'error';
+                }
+              });
+          }
+          // erase login & password from memory
+          this.login = '';
+          this.pass = '';
+        },
+        logIn: function () {
+          if (this.login.trim() !== '' && this.pass.trim()) {
+            let request = JSON.stringify({ login: this.login, pass: this.pass });
+            const qs = { action: 'login' };
+
+            fetchV2Json(this.apiURL, qs, request)
+              .then(response => {
+                if (response.ok) {
+                  localStorage.setItem('name', this.login);
+
+                  this.getTodos();
+
+                  this.step = 'items';
+                } else if (response.error === 'not found') {
+                  alert('The username or password is incorrect');
+                } else {
+                  this.step = 'error';
+                }
+              })
+          }
+          // erase login & password from memory
+          this.login = '';
+          this.pass = '';
+        },
+        logOut: function () {
+          const qs = { action: 'logout' };
+
+          fetchV2Json(this.apiURL, qs, '')
+            .then((response) => {
+              if (response.ok) {
+                localStorage.clear();
+
+                this.step = 'login';
+              }
+            });
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

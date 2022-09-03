@@ -195,32 +195,30 @@ let methods = {
         res: Record<string, any>
     ) => {
         console.log(`getItems: ${req.body}, session: ${req.session}`);
-        await get(req.session).then((content: contentType) => {
-            console.log(content);
-            responce(res, content.data);
-        })
+        let content: contentType = await get(req.session);
+        console.log(content);
+        responce(res, content.data);
     },
     deleteItem: async (
         req: { body: { id: itemType["id"] } } & Record<string, any>,
         res: Record<string, any>
     ) => {
-        await get(req.session).then((content: contentType) => {
-            if (req.body.id > content.id || req.body.id < 0) {
-                responce(res, { "ok": false });
-            } else {
-                getItem(
-                    content.data.items,
-                    req.body.id,
-                    async function (ind) {
-                        content.data.items.splice(ind, 1);
+        let content: contentType = await get(req.session);
+        if (req.body.id > content.id || req.body.id < 0) {
+            responce(res, { "ok": false });
+        } else {
+            getItem(
+                content.data.items,
+                req.body.id,
+                async function (ind) {
+                    content.data.items.splice(ind, 1);
 
-                        await set(req.session, content); //UPDATE usr data
-                        responce(res, { "ok": true });
-                    },
-                    () => responce(res, { "ok": false })
-                );
-            }
-        })
+                    await set(req.session, content); //UPDATE usr data
+                    responce(res, { "ok": true });
+                },
+                () => responce(res, { "ok": false })
+            );
+        }
     },
     addItem: async (
         req: { body: { text: itemType["text"] } } & Record<string, any>,
@@ -228,39 +226,36 @@ let methods = {
     ) => {
         let post = (content: contentType): contentType => {
             content.id++;
-            content.data.items.push({ id: content.id, text: req.body.text, checked: true });
+            content.data.items.push({ id: content.id, text: req.body.text, checked: false });
 
             return { id: content.id, data: content.data } as contentType;
         }
+        let content: contentType = await get(req.session);
+        let newContent = post(content);
 
-        await get(req.session).then(async (content: contentType) => {
-            let newContent = post(content);
-
-            await set(req.session, newContent); //UPDATE usr data
-            responce(res, { id: newContent.id });
-        })
+        await set(req.session, newContent); //UPDATE usr data
+        responce(res, { id: newContent.id });
     },
     editItem: async (
         req: { body: itemType } & Record<string, any>,
         res: Record<string, any>
     ) => {
-        await get(req.session).then((content: contentType) => {
-            if (req.body.id > content.id || req.body.id < 0) {
-                responce(res, { "ok": false });
-            } else {
-                getItem(
-                    content.data.items,
-                    req.body.id,
-                    async function (ind) {
-                        content.data.items[ind] = req.body;
+        let content: contentType = await get(req.session);
+        if (req.body.id > content.id || req.body.id < 0) {
+            responce(res, { "ok": false });
+        } else {
+            getItem(
+                content.data.items,
+                req.body.id,
+                async function (ind) {
+                    content.data.items[ind] = req.body;
 
-                        await set(req.session, content); //UPDATE usr data
-                        responce(res, { "ok": true });
-                    },
-                    () => responce(res, { "ok": false })
-                );
-            }
-        })
+                    await set(req.session, content); //UPDATE usr data
+                    responce(res, { "ok": true });
+                },
+                () => responce(res, { "ok": false })
+            );
+        }
     }
 }
 
