@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+</style>
+</head>
+<body>
+  <div id="xy" style="position: absolute;top: 0px;right: 0px;"></div>
+  
+  <script>
+    let xy = getbyId("xy");
+  
+    document.addEventListener('mousemove', e => {
+		let x = e.offsetX;
+		let y = e.offsetY;
+		xy.innerHTML = `X:${x}, Y:${y}`;
+	});
+  
+    function getbyId(id){
+		return document.getElementById(id);
+	}
+  </script>
+</body>
+</html>

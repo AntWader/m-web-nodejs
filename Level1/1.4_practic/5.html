@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.yellowsq {
+  width: 100px;
+  height: 100px;
+  background: yellow;
+  float: left;
+  border-right: 10px solid white;
+}
+.hidden {
+  visibility:hidden;
+}
+</style>
+</head>
+<body>
+    
+  <div class='yellowsq' onclick="hello(this)" ></div>
+  
+  <script>
+    function hello(el) {
+		alert('Hello');
+		el.setAttribute('onclick', 'newFunction(this)');
+	}
+	
+    function newFunction(el) {
+		el.classList.add('hidden')
+	}
+  </script>
+</body>
+</html>
