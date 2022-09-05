@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>hackathon</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+    </style>
+</head>
+
+<body>
+
+    <div id="app">
+        <button class="plus" @click="fetchPlus"> + </button>
+        <div>{{plus}}</div>
+        <button class="minus" @click="fetchMinus"> - </button>
+        <div>{{minus}}</div>
+    </div>
+
+    <script>
+        var button
+        (function (button) {
+            button[button["minus"] = 0] = "minus";
+            button[button["plus"] = 1] = "plus";
+        })(button || (button = {}));
+
+        let vue = new Vue({
+            el: '#app',
+            data: {
+                plus: 0,
+                minus: 0,
+                apiURL: 'http://localhost:3055/api/',
+            },
+            computed: {
+            },
+            mounted() {
+            },
+            methods: {
+                fetchPlus: function () {
+                    let req = JSON.stringify({ button: button.plus });
+
+                    fetch('http://localhost:3055/api/plus', {
+                        method: 'POST',
+                        body: req,
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    }).then(res => res.json())
+                        .then((response) => {
+                            this.plus = response[button.plus];
+                        });
+                },
+                fetchMinus: function () {
+                    let req = JSON.stringify({ button: button.minus });
+
+                    fetch('http://localhost:3055/api/minus', {
+                        method: 'POST',
+                        body: req,
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    }).then(res => res.json())
+                        .then((response) => {
+                            this.minus = response[button.minus];
+                        });
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
