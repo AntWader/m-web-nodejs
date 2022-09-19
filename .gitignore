@@ -1,13 +1,17 @@
 # Dependency directories
 node_modules/
 
+# WebStorm
+.idea/
+
 # not commit tusk
 3.Bugs_Roman/
 
 # heavy files
-Level3/3.2/frontend/books-page/
-Level3/3.2/frontend/book-page/
+Level3/3.2/frontend/books-page/books-page_files/
+Level3/3.2/frontend/book-page/book-page_files/
 Level3/3.2/frontend/books.zip
 
 # just hide
 Level3/3.2/estimate.txt
+Level3/3.2/real_estimates.txt
