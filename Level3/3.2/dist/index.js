@@ -1,33 +1,72 @@
 "use strict";
-function findProperty(name, obj) {
-    let keys = Object.keys(obj);
-    console.log(keys);
-    if (keys.length < 1) {
-        return null;
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
-    else {
-        for (let key of keys) {
-            if (key === name) {
-                return obj[key];
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
+const app = (0, express_1.default)();
+const port = 3000;
+// create application/json parser
+let jsonParser = body_parser_1.default.json();
+// static frontend
+app.use('/', express_1.default.static(path.join(__dirname, '../frontend/')));
+app.get('*', jsonParser, function (req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            if (req.url === '\/') { // url: /
+                res.send(fs.readFileSync(path.join(__dirname, '../frontend/books-page/books-page.html'), 'utf-8')
+                    .replace(/\.\/books-page_files\//g, 'http://localhost:3000/books-page/books-page_files/'));
             }
-            else {
-                let newObj = obj[key];
-                if (typeof newObj === 'object' &&
-                    !Array.isArray(newObj) &&
-                    newObj !== null) {
-                    let prop = findProperty(name, newObj);
-                    if (prop !== null)
-                        return prop;
-                }
+            if (/^\/\?/.test(req.url)) { // url starts from: /?
+                // let body = querystring.parse(req.url.replace('/?', ''));
+                // console.log(req.url)
+            }
+            if (/^\/book\//.test(req.url)) { // url starts from: /book/
+                res.send(fs.readFileSync(path.join(__dirname, '../frontend/book-page/book-page.html'), 'utf-8')
+                    .replace(/\.\/book-page_files\//g, 'http://localhost:3000/book-page/book-page_files/'));
             }
         }
-        //no matches found
-        return null;
-    }
-}
-let obj0 = { id: 0, 'book-k': "books-data" };
-let obj1 = { name: { id: 0, 'book-k': "books-data" } };
-let obj2 = { id: { id: { name: { id: 0, 'book-k': "books-data" } } } };
-console.log(findProperty('book-k', obj0));
-console.log(findProperty('book-k', obj1));
-console.log(findProperty('book-k', obj2));
+        catch (e) {
+            console.log(e);
+            res.status(500).send({ error: "...." }); //ERROR 500 server error
+        }
+    });
+});
+app.listen(port, () => {
+    console.log(`Example app listening on http://localhost:${port}/`);
+});
