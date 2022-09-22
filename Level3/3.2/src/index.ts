@@ -1,35 +1,35 @@
-function findProperty(name: string, obj: Record<string, any>): any {
-    let keys = Object.keys(obj)
-    console.log(keys)
-    if (keys.length < 1) {
-        return null
-    } else {
-        for (let key of keys) {
-            if (key === name) {
-                return obj[key]
-            } else {
-                let newObj = obj[key]
-                if (
-                    typeof newObj === 'object' &&
-                    !Array.isArray(newObj) &&
-                    newObj !== null
-                ) {
-                    let prop = findProperty(name, newObj)
-                    if (prop !== null) return prop
-                }
-            }
-        }
-        //no matches found
-        return null
-    }
+import express from "express";
+import bodyParser from "body-parser";
+
+import * as path from 'path';
+
+const app = express();
+const port = 3055;
+
+// create application/json parser
+let jsonParser = bodyParser.json();
+
+// static frontend
+app.use('/', express.static(path.join(__dirname, '../frontend/')));
+
+enum button {
+    "minus",
+    "plus"
 }
 
-let obj0 = {id: 0, 'book-k': "books-data"}
-let obj1 = {name: {id: 0, 'book-k': "books-data"}}
-let obj2 = {id: {id: {name: {id: 0, 'book-k': "books-data"}}}}
+let counter = [0, 0];
 
-console.log(findProperty('book-k', obj0))
+app.post('*', jsonParser,
+    (req, res) => {
+        console.log(req.url);
+        console.log(req.body);
 
-console.log(findProperty('book-k', obj1))
+        counter[req.body.button]++;
 
-console.log(findProperty('book-k', obj2))
+        res.send(counter);
+
+    })
+
+app.listen(port, () => {
+    console.log(`Example app listening on http://localhost:${port}/f_3055.html`);
+})
