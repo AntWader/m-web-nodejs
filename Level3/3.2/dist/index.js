@@ -39,6 +39,9 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
+const querystring_1 = __importDefault(require("querystring"));
+const booksTemplate_1 = require("./booksTemplate");
+const bookTemplate_1 = require("./bookTemplate");
 const app = (0, express_1.default)();
 const port = 3000;
 // create application/json parser
@@ -48,17 +51,21 @@ app.use('/', express_1.default.static(path.join(__dirname, '../frontend/')));
 app.get('*', jsonParser, function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            let books = JSON.parse(fs.readFileSync(path.join(__dirname, '../frontend/books-data.txt'), 'utf-8'));
             if (req.url === '\/') { // url: /
-                res.send(fs.readFileSync(path.join(__dirname, '../frontend/books-page/books-page.html'), 'utf-8')
-                    .replace(/\.\/books-page_files\//g, 'http://localhost:3000/books-page/books-page_files/'));
+                let content = books.slice(0, 2);
+                res.send((0, booksTemplate_1.makeBooksPage)(content, books.length));
             }
             if (/^\/\?/.test(req.url)) { // url starts from: /?
-                // let body = querystring.parse(req.url.replace('/?', ''));
-                // console.log(req.url)
+                let body = querystring_1.default.parse(req.url.replace(/^\/\?/, ''));
+                console.log(req.url);
+                let content = books.length > body.offset ? books.slice(0, body.offset) : books;
+                res.send((0, booksTemplate_1.makeBooksPage)(content, books.length));
             }
             if (/^\/book\//.test(req.url)) { // url starts from: /book/
-                res.send(fs.readFileSync(path.join(__dirname, '../frontend/book-page/book-page.html'), 'utf-8')
-                    .replace(/\.\/book-page_files\//g, 'http://localhost:3000/book-page/book-page_files/'));
+                let bookId = parseInt(req.url.replace(/^\/book\//, ''));
+                let book = books.find(el => el.id == bookId);
+                book ? res.send((0, bookTemplate_1.makeBookPage)(book)) : null;
             }
         }
         catch (e) {
