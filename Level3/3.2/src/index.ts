@@ -19,7 +19,7 @@ let jsonParser = bodyParser.json();
 // static frontend
 app.use('/', express.static(path.join(__dirname, '../frontend/')));
 
-app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', jsonParser, async function (req, res) {
     try {
@@ -110,10 +110,27 @@ app.get('/admin/api/v1/books', jsonParser, async function (req, res) {
     }
 });
 
-app.post('/admin/api/v1/book', jsonParser, async function (req, res) {
+
+import { cloudinaryUpload } from './models/uploadImg';
+import multer from 'multer';
+
+const storage = multer.diskStorage({
+    destination: 'uploads/',
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    },
+})
+
+const upload = multer({ storage: storage })
+
+app.post('/admin/api/v1/book', jsonParser, upload.single("img"), async function (req, res) {
     try {
         console.log(req.url)
         console.log(req.body)
+
+        console.log(req.file)
+
+        cloudinaryUpload(req.file?.path)
 
         res.writeHead(302, {
             Location: `http://localhost:${port}/admin/`

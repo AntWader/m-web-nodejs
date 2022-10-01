@@ -1,6 +1,9 @@
 # Dependency directories
 node_modules/
 
+# VScode
+.vscode/
+
 # WebStorm
 .idea/
 
@@ -13,8 +16,11 @@ Level3/3.2/frontend/books-page/books-page_coppy.html
 Level3/3.2/frontend/book-page/book-page_files/
 Level3/3.2/frontend/book-page/book-page_coppy.html
 Level3/3.2/frontend/books.zip
+Level3/3.2/uploads
 
 # just hide
 Level3/3.2/estimate.txt
 Level3/3.2/real_estimates.txt
 Level3/3.2/src/test.ts
+Level3/3.2/sqlScripts/help.txt
+Level3/3.2/dist
