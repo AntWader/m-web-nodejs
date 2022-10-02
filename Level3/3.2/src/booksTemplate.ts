@@ -1,6 +1,8 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
+const bookHost = 'http://localhost:3000/book/'
+
 /**
  * max offset on single page
  */
@@ -48,29 +50,26 @@ export function makeBooksPage(books: bookType[], maxOffset: number): string {
 
 export type bookType = {
     id: number | string,
-    author: string,
+    authors: string[],
     year: number | string,
     pages: number | string,
     isbn: string,
-    data: {
-        imgSrc: string,
-        imgHDSrc: string,
-        title: string,
-        description: string,
-        href: string
-    }
-} & Record<string, any>
+    img: string,
+    imgHD: string,
+    title: string,
+    description: string
+}
 
 function bookPreviewHTMLBlock(book: bookType): string {
     return `<div data-book-id=\"${book.id}\" class="book_item col-xs-6 col-sm-3 col-md-2 col-lg-2">
  <div class="book">
-     <a href=\"${book.data.href}\"><img src=\"${book.data.imgSrc}\" alt=\"${book.data.title}\">
-         <div data-title=\"${book.data.title}\" class="blockI" style="height: 46px;">
-             <div data-book-title=\"${book.data.title}\" class="title size_text">${book.data.title}</div>
-             <div data-book-author=\"${book.author}\" class="author">${book.author}</div>
+     <a href=\"${bookHost + book.id}\"><img src=\"${book.img}\" alt=\"${book.title}\">
+         <div data-title=\"${book.title}\" class="blockI" style="height: 46px;">
+             <div data-book-title=\"${book.title}\" class="title size_text">${book.title}</div>
+             <div data-book-author=\"${book.authors.join(', ')}\" class="author">${book.authors.join(', ')}</div>
          </div>
      </a>
-     <a href=\"${book.data.href}\">
+     <a href=\"${bookHost + book.id}\">
          <button type="button" class="details btn btn-success">Читать</button>
      </a>
  </div>

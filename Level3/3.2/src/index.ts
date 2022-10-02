@@ -19,7 +19,9 @@ let jsonParser = bodyParser.json();
 // static frontend
 app.use('/', express.static(path.join(__dirname, '../frontend/')));
 
-//app.use(bodyParser.urlencoded({ extended: true }));
+// import { connection as db } from './models/db'
+
+let booksStr = 'gerara here'
 
 app.get('/', jsonParser, async function (req, res) {
     try {
@@ -31,7 +33,8 @@ app.get('/', jsonParser, async function (req, res) {
 
         if (/^\/$/.test(req.url)) {
             let content = books.slice(0, 2)
-            res.send(makeBooksPage(content, books.length));
+            //res.send(makeBooksPage(content, books.length));
+            res.send(booksStr)
         }
         if (/^\/\?/.test(req.url)) {
             // I NEED TO ADD SEARCH COMPONENTS !!!!!!!!!!
@@ -111,7 +114,7 @@ app.get('/admin/api/v1/books', jsonParser, async function (req, res) {
 });
 
 
-import { cloudinaryUpload } from './models/uploadImg';
+// import { cloudinaryUpload } from './models/uploadImg';
 import multer from 'multer';
 
 const storage = multer.diskStorage({
@@ -130,7 +133,7 @@ app.post('/admin/api/v1/book', jsonParser, upload.single("img"), async function 
 
         console.log(req.file)
 
-        cloudinaryUpload(req.file?.path)
+        //cloudinaryUpload(req.file?.path)
 
         res.writeHead(302, {
             Location: `http://localhost:${port}/admin/`

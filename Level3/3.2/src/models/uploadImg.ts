@@ -7,28 +7,20 @@ cloudinary.config({
     secure: true
 });
 
-export function cloudinaryUpload(file: any) {
-    cloudinary.uploader
-        .upload(file,
-            {
-                folder: 'books',
-                resource_type: 'image',
-                use_filename: true,
-                unique_filename: false,
-                overwrite: true
-            })
-        .then(result => console.log(result.secure_url))
-        .catch(error => console.log(error))
-}
+export async function cloudinaryUpload(filepath: string) {
+    try {
+        let result = await cloudinary.uploader
+            .upload(filepath,
+                {
+                    folder: 'books',
+                    resource_type: 'image',
+                    use_filename: true,
+                    unique_filename: false,
+                    overwrite: true
+                })
 
-// cloudinary.uploader
-//     .upload('./frontend/books-page/books-page_files/22.jpg',
-//         {
-//             folder: 'books',
-//             resource_type: 'image',
-//             use_filename: true,
-//             unique_filename: false,
-//             overwrite: true
-//         })
-//     .then(result => console.log('success', JSON.stringify(result, null, 2)))
-//     .catch(error => console.log(error))
+        return result
+    } catch (e) {
+        console.log(e);
+    }
+}

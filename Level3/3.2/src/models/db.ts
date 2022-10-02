@@ -1,5 +1,7 @@
 import mysql from "mysql";
 
+import { promisify } from 'util';
+
 const dbConfig = {
     HOST: "85.10.205.173",
     USER: "nodejs32test",
@@ -7,7 +9,6 @@ const dbConfig = {
     DB: "nodejs32test"
 };
 
-// Create a connection to the database
 const connection = mysql.createConnection({
     host: dbConfig.HOST,
     user: dbConfig.USER,
@@ -15,10 +16,19 @@ const connection = mysql.createConnection({
     database: dbConfig.DB
 });
 
-// open the MySQL connection
-connection.connect(error => {
-    if (error) throw error;
-    console.log("Successfully connected to the database.");
-});
+async function makeConnection() {
+    console.log('Connecting to mysql DB...')
 
-export const db = connection;
+    const connect = promisify(connection.connect.bind(connection))
+
+    let answer = await connect();
+    console.log(answer)
+}
+
+makeConnection()
+
+export async function db(command: string) {
+    const execute = promisify(connection.query.bind(connection))
+
+    return JSON.parse(JSON.stringify(await execute(command))) as Promise<object[]>
+}
