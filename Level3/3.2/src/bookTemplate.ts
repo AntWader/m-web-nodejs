@@ -29,7 +29,7 @@ export function makeBookPage(book: bookType): string {
 function bookPreviewHTMLBlock(book: bookType): string {
     return `<div id="id" book-id=\"${book.id}\">
 <div id="bookImg" class="col-xs-12 col-sm-3 col-md-3 item" style="margin:0px;">
-    <img src=\"${book.img}\" alt="Responsive image" class="img-responsive">
+    <img src=\"${book.imgHD ? book.imgHD : book.img}\" alt="Responsive image" class="img-responsive">
     <hr>
 </div>
 <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 info">
@@ -39,11 +39,11 @@ function bookPreviewHTMLBlock(book: bookType): string {
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <div class="bookLastInfo">
             <div class="bookRow"><span class="properties">автор:</span><span id="author">${book.authors}</span></div>
-            <div class="bookRow"><span class="properties">год:</span><span id="year">${book.year}</span>
+            <div class="bookRow"><span class="properties">год:</span><span id="year">${book.year ? book.year : '-'}</span>
             </div>
-            <div class="bookRow"><span class="properties">страниц:</span><span id="pages">${book.pages}</span>
+            <div class="bookRow"><span class="properties">страниц:</span><span id="pages">${book.pages ? book.pages : '-'}</span>
             </div>
-            <div class="bookRow"><span class="properties">isbn:</span><span id="isbn"></span>${book.isbn}</div>
+            <div class="bookRow"><span class="properties">isbn:</span><span id="isbn"></span>${book.isbn ? book.isbn : '-'}</div>
         </div>
     </div>
     <div class="btnBlock col-xs-12 col-sm-12 col-md-12">
@@ -52,13 +52,13 @@ function bookPreviewHTMLBlock(book: bookType): string {
     <div class="bookDescription col-xs-12 col-sm-12 col-md-12 hidden-xs hidden-sm">
         <h4>О книге</h4>
         <hr>
-        <p id="description">${book.description}</p>
+        <p id="description">${book.description ? book.description : ''}</p>
     </div>
 </div>
 <div class="bookDescription col-xs-12 col-sm-12 col-md-12 hidden-md hidden-lg">
     <h4>О книге</h4>
     <hr>
-    <p class="description">${book.description}</p>
+    <p class="description">${book.description ? book.description : ''}</p>
 </div>
 </div>`
 }

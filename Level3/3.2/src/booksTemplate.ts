@@ -63,7 +63,7 @@ export type bookType = {
 function bookPreviewHTMLBlock(book: bookType): string {
     return `<div data-book-id=\"${book.id}\" class="book_item col-xs-6 col-sm-3 col-md-2 col-lg-2">
  <div class="book">
-     <a href=\"${bookHost + book.id}\"><img src=\"${book.img}\" alt=\"${book.title}\">
+     <a href=\"${bookHost + book.id}\"><img src=\"${book.imgHD ? book.imgHD : book.img}\" alt=\"${book.title}\">
          <div data-title=\"${book.title}\" class="blockI" style="height: 46px;">
              <div data-book-title=\"${book.title}\" class="title size_text">${book.title}</div>
              <div data-book-author=\"${book.authors}\" class="author">${book.authors}</div>
