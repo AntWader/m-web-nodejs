@@ -10,5 +10,6 @@ SELECT
     books.description
 FROM books
     JOIN authors ON authors.author_id IN 
-        (SELECT author_id FROM book_author_id WHERE book_author_id.book_id = books.book_id)
+        (SELECT author_id FROM book_author_id 
+        WHERE book_author_id.book_id = books.book_id)
 GROUP BY books.book_id

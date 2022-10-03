@@ -60,3 +60,7 @@
 --         (SELECT author_id FROM book_author_id WHERE book_author_id.book_id = books.book_id)
 -- WHERE books.book_id = '5'
 -- GROUP BY books.book_id
+
+-- ALTER TABLE books
+-- ADD COLUMN clicks INT DEFAULT '0' NOT NULL AFTER views;
+-- SELECT book_id, views, clicks FROM books

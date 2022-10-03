@@ -11,9 +11,9 @@ node_modules/
 3.Bugs_Roman/
 
 # heavy files
-Level3/3.2/frontend/books-page/books-page_files/
+Level3/3.2/frontend/books-page/books-page_files/*.jpg
 Level3/3.2/frontend/books-page/books-page_coppy.html
-Level3/3.2/frontend/book-page/book-page_files/
+Level3/3.2/frontend/book-page/book-page_files/*.jpg
 Level3/3.2/frontend/book-page/book-page_coppy.html
 Level3/3.2/frontend/books.zip
 Level3/3.2/uploads

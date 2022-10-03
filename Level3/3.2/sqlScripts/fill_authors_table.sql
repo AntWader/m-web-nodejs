@@ -1,4 +1,4 @@
-INSERT INTO authors (name)
+INSERT INTO authors (author)
 VALUES ("Андрей Богуславский"),
     ("Марк Саммерфильд"),
     ("М. Вильямс"),
