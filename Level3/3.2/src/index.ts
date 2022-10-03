@@ -19,22 +19,22 @@ let jsonParser = bodyParser.json();
 // static frontend
 app.use('/', express.static(path.join(__dirname, '../frontend/')));
 
-// import { connection as db } from './models/db'
+import { db } from './models/db';
 
-let booksStr = 'gerara here'
+const getBooksStr = fs.readFileSync('./sqlScripts/get_books-page.sql').toString()
+
+const getBookStr = fs.readFileSync('./sqlScripts/get_book-page.sql').toString()
 
 app.get('/', jsonParser, async function (req, res) {
     try {
         console.log('/')
         console.log(req.url)
 
-        let books = JSON.parse(fs.readFileSync(
-            path.join(__dirname, '../frontend/books-data.txt'), 'utf-8')) as bookType[]
+        let books = await db(getBooksStr) as bookType[]
 
         if (/^\/$/.test(req.url)) {
-            let content = books.slice(0, 2)
-            //res.send(makeBooksPage(content, books.length));
-            res.send(booksStr)
+            let content = books.slice(0, 3)
+            res.send(makeBooksPage(content, books.length));
         }
         if (/^\/\?/.test(req.url)) {
             // I NEED TO ADD SEARCH COMPONENTS !!!!!!!!!!
@@ -56,10 +56,14 @@ app.get('/book/:bookId', jsonParser, async function (req, res) {
         console.log('/book/:bookId')
         console.log(req.url)
 
-        let books = JSON.parse(fs.readFileSync(
-            path.join(__dirname, '../frontend/books-data.txt'), 'utf-8')) as bookType[]
+        let books = await db(
+            getBookStr.replace(
+                /WHERE\s+books.book_id\s*\=\s*\'\d+\'/,
+                `WHERE books.book_id = \'${req.params.bookId}\'`
+            )
+        ) as bookType[]
 
-        let book = books.find(el => el.id == req.params.bookId)
+        let book = books[0]
 
         book ? res.send(makeBookPage(book)) : res.status(404).send({ error: "...." });
     } catch (e) {

@@ -41,16 +41,16 @@ export function makeBooksPage(books: bookType[], maxOffset: number): string {
         .replace(
             /\.\/books-page_files\//g,
             'http://localhost:3000/books-page/books-page_files/')
-        .replace(/[\n\r].*const\s+offsetLimit\s+=\s*\d+/, `const offsetLimit = ${offsetLimit}\n`)
-        .replace(/[\n\r].*const\s+maxOffset\s+=\s*\d+/, `const maxOffset = ${maxOffset}\n`)
-        .replace(/[\n\r].*const\s+minOffset\s+=\s*\d+/, `const minOffset = ${minOffset}\n`)
-        .replace(/[\n\r].*const\s+offsetShift\s+=\s*\d+/, `const offsetShift = ${offsetShift}\n`)
-        .replace(/[\n\r].*const\s+offset\s+=\s*\d+/, `const offset = ${books.length}\n`)
+        .replace(/[\n\r].*const\s+offsetLimit\s*=\s*\d+/, `const offsetLimit = ${offsetLimit}\n`)
+        .replace(/[\n\r].*const\s+maxOffset\s*=\s*\d+/, `const maxOffset = ${maxOffset}\n`)
+        .replace(/[\n\r].*const\s+minOffset\s*=\s*\d+/, `const minOffset = ${minOffset}\n`)
+        .replace(/[\n\r].*const\s+offsetShift\s*=\s*\d+/, `const offsetShift = ${offsetShift}\n`)
+        .replace(/[\n\r].*const\s+offset\s*=\s*\d+/, `const offset = ${books.length}\n`)
 }
 
 export type bookType = {
     id: number | string,
-    authors: string[],
+    authors: string,
     year: number | string,
     pages: number | string,
     isbn: string,
@@ -66,7 +66,7 @@ function bookPreviewHTMLBlock(book: bookType): string {
      <a href=\"${bookHost + book.id}\"><img src=\"${book.img}\" alt=\"${book.title}\">
          <div data-title=\"${book.title}\" class="blockI" style="height: 46px;">
              <div data-book-title=\"${book.title}\" class="title size_text">${book.title}</div>
-             <div data-book-author=\"${book.authors.join(', ')}\" class="author">${book.authors.join(', ')}</div>
+             <div data-book-author=\"${book.authors}\" class="author">${book.authors}</div>
          </div>
      </a>
      <a href=\"${bookHost + book.id}\">

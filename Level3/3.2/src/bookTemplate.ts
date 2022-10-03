@@ -38,7 +38,7 @@ function bookPreviewHTMLBlock(book: bookType): string {
     </div>
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <div class="bookLastInfo">
-            <div class="bookRow"><span class="properties">автор:</span><span id="author">${book.authors.join(', ')}</span></div>
+            <div class="bookRow"><span class="properties">автор:</span><span id="author">${book.authors}</span></div>
             <div class="bookRow"><span class="properties">год:</span><span id="year">${book.year}</span>
             </div>
             <div class="bookRow"><span class="properties">страниц:</span><span id="pages">${book.pages}</span>
