@@ -11,12 +11,12 @@ const port = 3000;
 // static frontend
 app.use('/', express.static(path.join(__dirname, '../frontend/')));
 
-function checkUrl(req: express.Request, res: express.Response, next: () => void) {
-    console.log(req.originalUrl);
+function logUrl(req: express.Request, res: express.Response, next: () => void) {
+    console.log(new Date().toUTCString(), req.originalUrl);
     next();
 }
 
-app.use(checkUrl);
+app.use(logUrl);
 
 app.use('/', routerLibrary);
 

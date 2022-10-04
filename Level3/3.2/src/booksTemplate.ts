@@ -26,22 +26,26 @@ export const offsetShift = 10
  * 
  * @param offset number of books to read
  * @param bookHost full url for books page
+ * @param orderSQL SQL string which will be added in the end of getBooksStr
  * @returns HTML template
  */
 export async function makeBooksPage(
     offset: number,
     bookHost: string,
-    orderSQL?: string
+    searchSQL?: string
 ): Promise<string> {
 
-    // Getting first property of object like: [{'...': number}]
-    let maxOffset = Object.values((await db(getBooksLength))[0])[0]
+    let booksSqlStr = getBooksStr
+        .concat(searchSQL ? ' \n'.concat(searchSQL) : '')
 
-    let books = await db(getBooksStr
-        .concat(orderSQL ? ' \n'.concat(orderSQL) : '')
-        .concat(` \nLIMIT ${offset > offsetLimit ? offsetLimit : 0
-            }, ${offset
-            }`)) as bookType[]
+    let books = await db(
+        booksSqlStr
+            .concat(` \nLIMIT ${offset > offsetLimit ? offsetLimit : 0}, ${offset}`)) as bookType[]
+
+    // Getting first property of object like: [{'...': number}]
+    let maxOffset = Object.values((await db(
+        getBooksLength.replace('books', `\(${booksSqlStr}\) AS originalName`)
+    ))[0])[0]
 
     /**
      * String with HTML code blocks of {offset: number} of books to display on current page
@@ -51,7 +55,7 @@ export async function makeBooksPage(
     let booksBlocks: string = books
         .map(b => bookPreviewHTMLBlock(b, bookHost)).join('\n')
 
-    return fs.readFileSync(path.join(__dirname, '../frontend/books-page/books-page.html'), 'utf-8')
+    let booksPage = fs.readFileSync(path.join(__dirname, '../frontend/books-page/books-page.html'), 'utf-8')
         .replace(/<!--\s*id="content"\s*-->/, booksBlocks)
         .replace(
             /\.\/books-page_files\//g,
@@ -60,7 +64,18 @@ export async function makeBooksPage(
         .replace(/[\n\r].*const\s+maxOffset\s*=\s*\d+/, `const maxOffset = ${maxOffset}\n`)
         .replace(/[\n\r].*const\s+minOffset\s*=\s*\d+/, `const minOffset = ${minOffset}\n`)
         .replace(/[\n\r].*const\s+offsetShift\s*=\s*\d+/, `const offsetShift = ${offsetShift}\n`)
-        .replace(/[\n\r].*const\s+offset\s*=\s*\d+/, `const offset = ${offset}\n`)
+        .replace(/[\n\r].*const\s+offset\s*=\s*\d+/, `const offset = ${Math.min(offset, books.length)}\n`)
+
+    if (searchSQL) {
+        let search = searchSQL.match(/\'\%[\w\sА-я]+\%\'/);
+        booksPage = booksPage
+            .replace(
+                /id=\"search\" type=\"text\" placeholder=\"[\w\sА-я]+\"/,
+                `id=\"search\" type=\"text\" placeholder=\"${search ? search[0].replace(/[\'\%]/g, '') : 'error'
+                }\"`)
+    }
+
+    return booksPage
 }
 
 export type bookType = {

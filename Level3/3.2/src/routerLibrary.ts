@@ -13,6 +13,10 @@ import { db } from './models/db';
 
 const getBookStr = fs.readFileSync('./sqlScripts/get_book-page.sql').toString()
 
+const booksSearchStr = fs.readFileSync('./sqlScripts/search_str_books-page.sql').toString()
+const booksSearchAuthor = fs.readFileSync('./sqlScripts/search_str_books-page_author_id.sql').toString()
+const booksSearchYear = fs.readFileSync('./sqlScripts/search_str_books-page_year.sql').toString()
+
 const updateBookViews = fs.readFileSync('./sqlScripts/update_books_views.sql').toString()
 
 const updateBookClicks = fs.readFileSync('./sqlScripts/update_books_clicks.sql').toString()
@@ -31,11 +35,30 @@ routerLibrary.get('/', jsonParser, async function (req, res) {
             res.send(await makeBooksPage(minOffset, bookUrl));
         }
         if (/^\/\?/.test(req.url)) {
-            // I NEED TO ADD SEARCH COMPONENTS !!!!!!!!!!
-            let body = querystring.parse(req.url.replace(/^\/\?/, '')) as unknown as { offset: number }
+            let body = querystring.parse(
+                req.url.replace(/^\/\?/, '')
+            ) as unknown as { offset: number, search?: string, author?: number, year?: number }
 
             if (body.offset) {
-                res.send(await makeBooksPage(body.offset, bookUrl, 'ORDER BY authors'));
+                if (body.search) {
+                    let searchStr = body.search ?
+                        `WHERE \n${booksSearchStr.replace(/searchString/g, body.search)} ` :
+                        '';
+                    let searchAuthor = body.author ?
+                        `\nAND ${booksSearchAuthor.replace(/\.author_id\s*=\s*\'\d+\'/, `.author_id = \'${body.author}\'`)} ` :
+                        '';
+                    let searchYear = body.year ?
+                        `\nAND${booksSearchYear.replace(/yearString/g, `${body.year}`)} ` :
+                        '';
+
+                    res.send(await makeBooksPage(
+                        body.offset,
+                        bookUrl,
+                        searchStr + searchAuthor + searchYear
+                    ));
+                } else {
+                    res.send(await makeBooksPage(body.offset, bookUrl));
+                }
             } else res.status(404).send({ error: "...." });
         }
     } catch (e) {

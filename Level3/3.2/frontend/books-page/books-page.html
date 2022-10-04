@@ -62,7 +62,7 @@
                                         $("#search").bind("keypress", function (e) {
                                             if (e.keyCode == 13) {
                                                 e.preventDefault();
-                                                alert("а вот это придется сделать самому. Ваш @rshmelev");
+                                                window.location.href = `http://localhost:3000/?offset=10&search=${$("#search").val()}`;
                                             }
                                         })
                                     </script>
@@ -151,7 +151,7 @@
         // calculate how many books can be added
         let getMore = offset + offsetShift > maxOffset ? maxOffset : offset + offsetShift;
 
-        if (offset == maxOffset) $("#get10more").css('display', 'none')
+        if (offset >= maxOffset) $("#get10more").css('display', 'none')
 
         $("#get10more").text(`v +${getMore - offset}`);
 
@@ -172,7 +172,7 @@
         $("#get10less").text(`^ -${getLess}`);
 
         $("#get10less").click(function () {
-            window.location.href = `http://localhost:3000/?offset=${offset - getLess}`
+            window.location.href = `http://localhost:3000/?offset=${offset - getLess}`;
         })
 
     </script>
