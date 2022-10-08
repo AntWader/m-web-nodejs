@@ -32,6 +32,7 @@ export const offsetShift = 10
 export async function makeBooksPage(
     offset: number,
     bookHost: string,
+    searchPlaceholder?: string,
     searchSQL?: string
 ): Promise<string> {
 
@@ -45,7 +46,7 @@ export async function makeBooksPage(
     // Getting first property of object like: [{'...': number}]
     let maxOffset = Object.values((await db(
         getBooksLength.replace('books', `\(${booksSqlStr}\) AS originalName`)
-    ))[0])[0]
+    ) as object[])[0])[0]
 
     /**
      * String with HTML code blocks of {offset: number} of books to display on current page
@@ -66,13 +67,20 @@ export async function makeBooksPage(
         .replace(/[\n\r].*const\s+offsetShift\s*=\s*\d+/, `const offsetShift = ${offsetShift}\n`)
         .replace(/[\n\r].*const\s+offset\s*=\s*\d+/, `const offset = ${Math.min(offset, books.length)}\n`)
 
-    if (searchSQL) {
-        let search = searchSQL.match(/\'\%[\w\sА-я]+\%\'/);
+    // if (searchSQL) {
+    //     let search = searchSQL.match(/\'\%[\w\sА-я]+\%\'/);
+    //     booksPage = booksPage
+    //         .replace(
+    //             /id=\"search\" type=\"text\" placeholder=\"[\w\sА-я]+\"/,
+    //             `id=\"search\" type=\"text\" placeholder=\"${search ? search[0].replace(/[\'\%]/g, '') : 'error'
+    //             }\"`)
+    // }
+
+    if (searchPlaceholder) {
         booksPage = booksPage
             .replace(
                 /id=\"search\" type=\"text\" placeholder=\"[\w\sА-я]+\"/,
-                `id=\"search\" type=\"text\" placeholder=\"${search ? search[0].replace(/[\'\%]/g, '') : 'error'
-                }\"`)
+                `id=\"search\" type=\"text\" placeholder=\"${searchPlaceholder}\"`)
     }
 
     return booksPage

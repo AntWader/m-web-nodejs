@@ -2,6 +2,11 @@ import mysql from "mysql";
 
 import { promisify } from 'util';
 
+/**
+ * Regex: /[^\w\s\-\+\,\.а-яА-ЯіІїЇєЄ]/g
+ */
+export const whiteFilter = /[^\w\s\-\+\,\.а-яА-ЯіІїЇєЄ]/g
+
 const dbConfig = {
     HOST: "85.10.205.173",
     USER: "nodejs32test",
@@ -22,13 +27,15 @@ async function makeConnection() {
     const connect = promisify(connection.connect.bind(connection))
 
     let answer = await connect();
-    console.log(answer)
+    console.log(`Connection state: ${connection.state} \n`, answer)
 }
 
 makeConnection()
 
 export async function db(command: string) {
+    if (connection.state === 'disconnected') await makeConnection()
+
     const execute = promisify(connection.query.bind(connection))
 
-    return JSON.parse(JSON.stringify(await execute(command))) as Promise<object[]>
+    return JSON.parse(JSON.stringify(await execute(command))) as Promise<object>
 }

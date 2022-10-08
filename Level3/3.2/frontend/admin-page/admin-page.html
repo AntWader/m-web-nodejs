@@ -19,18 +19,20 @@
     <style>
         #admin-content {
             padding-top: 20px;
-            width: 80%;
+            width: 90%;
             margin: auto;
         }
 
         .books-data {
             display: inline-block;
             text-align: center;
+            max-width: 65%;
         }
 
         #add-book {
             display: inline-block;
             text-align: center;
+            max-width: 35%;
         }
     </style>
 </head>
@@ -38,48 +40,26 @@
 <body>
     <div id="admin-content">
         <div class="books-data">
-            <table class="table table-striped table-bordered">
+            <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col">img</th>
+                        <th scope="col">id</th>
+                        <th scope="col">title</th>
+                        <th scope="col">authors</th>
+                        <th scope="col">views</th>
+                        <th scope="col">clicks</th>
+                        <th scope="col">delete<br />time</th>
                     </tr>
                 </thead>
                 <tbody id="books-table">
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+
                 </tbody>
             </table>
 
-            <nav aria-label="Page navigation example">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Previous</a>
-                    </li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
+            <nav aria-label="Books navigation">
+                <ul id="nav-books" class="pagination justify-content-center">
+
                 </ul>
             </nav>
         </div>
@@ -87,47 +67,148 @@
         <div id="add-book">
 
             <form action="http://localhost:3000/admin/api/v1/book" method="POST" class="needs-validation container"
-                novalidate enctype="multipart/form-data">
+                novalidate enctype="multipart/form-data" id="formBook">
                 <div class="form-row">
-                    <div class="col-md-6 mb-3">
-                        <input type="text" name="name" class="form-control" id="validationBookName"
-                            placeholder="Book name" required>
-                        <div class="valid-tooltip">
-                            Looks good!
+                    <div class="col-md-6">
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <input type="text" name="title" class="form-control" id="validationBookName"
+                                    placeholder="Book title*" required>
+                                <div class="valid-tooltip">
+                                    Looks good!
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <input type="text" name="author" class="form-control" id="validationAuthorName"
-                            placeholder="Author ame" required>
-                        <div class="valid-tooltip">
-                            Looks good!
+
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <input type="text" name="isbn" class="form-control" id="validationBookIsbn"
+                                    placeholder="isbn" required>
+                                <div class="valid-tooltip">
+                                    Looks good!
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="form-row">
+                            <div class="col-md-4 mb-3">
+                                <input type="text" name="year" class="form-control" id="validationBookYear"
+                                    placeholder="year" required>
+                                <div class="valid-tooltip">
+                                    Looks good!
+                                </div>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <input type="text" name="pages" class="form-control" id="validationBookPages"
+                                    placeholder="pages" required>
+                                <div class="valid-tooltip">
+                                    Looks good!
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <input type="file" name="img" accept="image/png, image/gif, image/jpeg"
+                                    class="form-control" id="validationBookImg">
+                                <div class="valid-feedback">
+                                    Correct type.
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please choose png, gif, jpeg image type.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <img id="formBookImg" src="#" style="width:168px;" alt="Image missing" />
+                            </div>
+                        </div>
+
+                        <script>
+                            function validateImg() {
+                                var ext = $("#validationBookImg").val().split('.').pop();
+
+                                if (/(png|jpeg|jpg|gif)/.test(ext)) {
+                                    $("#validationBookImg").removeClass("is-invalid");
+                                    $("#validationBookImg").addClass("is-valid");
+                                } else {
+                                    $("#validationBookImg").removeClass("is-valid");
+                                    $("#validationBookImg").addClass("is-invalid");
+                                }
+                            }
+                            validationBookImg.onchange = evt => {
+                                const [file] = validationBookImg.files
+                                if (file) {
+                                    formBookImg.src = URL.createObjectURL(file)
+                                }
+
+                                validateImg();
+                            }
+                        </script>
                     </div>
 
+                    <div class="col-md-6" id="form-second-col">
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <input type="text" name="authors[0]" class="form-control" id="validationAuthor0"
+                                    placeholder="Author name*" required>
+                                <div class="valid-tooltip">
+                                    Looks good!
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <div class="form-row" id="formAddAuthorRow">
+                                    <div class="col-md-12 mb-3">
+                                        <button class="btn btn-outline-primary" type="button" id="formAddAuthorBtn"
+                                            onclick="addAuthor()">+1 Author name</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <textarea class="form-control" rows="8" id="validationDescription" name="description"
+                                    placeholder="Description of the book..."></textarea>
+                                <div class="valid-tooltip">
+                                    Looks good!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="col-md-2 mb-3">
-                        <input type="text" name="year" class="form-control" id="validationBookYear" placeholder="year"
-                            required>
-                        <div class="valid-tooltip">
-                            Looks good!
-                        </div>
+                <div class="form-row align-items-center">
+                    <div class="col-md-12 mb-3">
+                        <button class="btn btn-primary" type="submit">Submit form</button>
                     </div>
                 </div>
-
-                <div class="form-row">
-                    <div class="col-md-6 mb-3">
-                        <label for="validationBookImg">book img file</label>
-                        <input type="file" name="img" class="form-control-file" id="BookImg">
-                        <div class="valid-tooltip">
-                            Looks good!
-                        </div>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" type="submit">Submit form</button>
             </form>
+            <script>
+                let newAuthorsCount = 0;
+                function addAuthor() {
+                    $('#formAddAuthorBtn').blur();
+
+                    newAuthorsCount++;
+                    $(
+                        `<div class="form-row">
+                                    <div class="col-md-12 mb-3">
+                                        <input type="text" name="authors[${newAuthorsCount}]" class="form-control"
+                                            id="validationAuthor${newAuthorsCount}" placeholder="Author №${newAuthorsCount + 1} name" required>
+                                        <div class="valid-tooltip">
+                                            Looks good!
+                                        </div>
+                                    </div>
+                                </div>
+                                `
+                    ).insertBefore('#formAddAuthorRow');
+                }
+            </script>
         </div>
     </div>
 
@@ -142,6 +223,109 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
+
+    <script>
+        function getBooks() {
+            return fetch('http://localhost:3000/admin/api/v1/books', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }).then(res => res.json())
+        }
+
+        function addBook(book) {
+            $('#books-table').append(
+                `
+                    <tr>
+                        <th scope="row">
+                            <img src="${book.img}" alt="img" style="width:28px;height:40px;">
+                        </th>
+                        <th scope="row">${book.id}</th>
+                        <td class="text-break" style="max-width: 160px;">${book.title}</td>
+                        <td class="text-break" style="max-width: 120px;">${book.authors}</td>
+                        <td>${book.views}</td>
+                        <td>${book.clicks}</td>
+                        <td class="text-break" style="max-width: 110px;">${book.delete_time ?
+                    new Date(book.delete_time).toUTCString().split(' ').slice(0, -2).join(' ') :
+                    `<a href="http://localhost:3000/admin/api/v1/book/${book.id}">delete</a>`
+                }</td>
+                    </tr>`
+            )
+        }
+
+        let books = []; // books array
+        const pageLength = 4; // books number in single page
+        let pageNum = 0; // page number
+        const pageLim = 5; // max pages buttons
+
+        function addBooks(from, to) {
+            $('#books-table').empty();
+            [...Array(Math.min(to, books.length) - from).keys()].map(x => x + from)
+                .forEach(i => addBook(books[i]))
+        }
+
+        getBooks().then(b => {
+            books = b;
+            pageNum = Math.floor(books.length / pageLength) + (books.length % pageLength > 0 ? 1 : 0);
+
+            addBooks(0, pageLength);
+            booksNavigate(1, Math.min(pageLim, pageNum), 1);
+        })
+
+        // start from 1
+        function booksNavigate(start, end, selected) {
+            $('#nav-books').empty();
+
+            let buttons = [...Array(end - start + 1).keys()].map(x => x + start)
+                .map(i =>
+                    selected != i ?
+                        `<li class="page-item" onclick="page(${i})">
+                            <a class="page-link">${i}</a>
+                        </li>` :
+                        `<li class="page-item disabled">
+                            <a class="page-link" tabindex="-1">${i}</a>
+                        </li>`
+                ).join(' \n');
+
+            //console.log([...Array(end - start + 1).keys()].map(x => x + start).length)
+
+            $('#nav-books').append(
+                `${selected != 1 ?
+                    `<li class="page-item" onclick="page(1)">
+                        <a class="page-link"><<</a>
+                    </li>`:
+                    `<li class="page-item disabled">
+                        <a class="page-link" tabindex="-1"><<</a>
+                    </li>`
+                }
+                ${buttons}                    
+                ${selected != pageNum ?
+                    `<li class="page-item" onclick="page(pageNum)">
+                    <a class="page-link">>></a>
+                </li>`:
+                    `<li class="page-item disabled">
+                     <a class="page-link" tabindex="-1">>></a>
+                </li>`
+                }`
+            )
+        }
+
+        function page(num) {
+            const edge = Math.floor(pageLim / 2)
+
+            addBooks((num - 1) * pageLength, num * pageLength);
+
+            if (num <= edge) {
+                booksNavigate(1, pageLim, num);
+            } else if (num + edge > pageNum) {
+                booksNavigate(pageNum - pageLim, pageNum, num);
+            } else {
+                booksNavigate(num - edge, num + edge, num);
+            }
+        }
+    </script>
 </body>
 
 </html>

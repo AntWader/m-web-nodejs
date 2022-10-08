@@ -8,7 +8,7 @@ import querystring from 'querystring';
 import { makeBooksPage, minOffset, bookType } from "./booksTemplate";
 import { makeBookPage } from "./bookTemplate";
 
-import { db } from './models/db';
+import { db, whiteFilter } from './models/db';
 
 
 const getBookStr = fs.readFileSync('./sqlScripts/get_book-page.sql').toString()
@@ -40,24 +40,34 @@ routerLibrary.get('/', jsonParser, async function (req, res) {
             ) as unknown as { offset: number, search?: string, author?: number, year?: number }
 
             if (body.offset) {
-                if (body.search) {
-                    let searchStr = body.search ?
-                        `WHERE \n${booksSearchStr.replace(/searchString/g, body.search)} ` :
-                        '';
-                    let searchAuthor = body.author ?
-                        `\nAND ${booksSearchAuthor.replace(/\.author_id\s*=\s*\'\d+\'/, `.author_id = \'${body.author}\'`)} ` :
-                        '';
-                    let searchYear = body.year ?
-                        `\nAND${booksSearchYear.replace(/yearString/g, `${body.year}`)} ` :
-                        '';
-
+                // SQL injections prevent
+                if (body.search && (whiteFilter.test(body.search))) {
                     res.send(await makeBooksPage(
                         body.offset,
                         bookUrl,
-                        searchStr + searchAuthor + searchYear
+                        'Invalid search string!'
                     ));
                 } else {
-                    res.send(await makeBooksPage(body.offset, bookUrl));
+                    if (body.search) {
+                        let searchStr = body.search ?
+                            `WHERE \n${booksSearchStr.replace(/searchString/g, body.search)} ` :
+                            '';
+                        let searchAuthor = body.author ?
+                            `\nAND ${booksSearchAuthor.replace(/\.author_id\s*=\s*\'\d+\'/, `.author_id = \'${body.author}\'`)} ` :
+                            '';
+                        let searchYear = body.year ?
+                            `\nAND${booksSearchYear.replace(/yearString/g, `${body.year}`)} ` :
+                            '';
+
+                        res.send(await makeBooksPage(
+                            body.offset,
+                            bookUrl,
+                            'Search: '.concat(body.search),
+                            searchStr + searchAuthor + searchYear
+                        ));
+                    } else {
+                        res.send(await makeBooksPage(body.offset, bookUrl));
+                    }
                 }
             } else res.status(404).send({ error: "...." });
         }
@@ -74,7 +84,7 @@ routerLibrary.get('/book/:bookId', jsonParser, async function (req, res) {
                 /WHERE\s+books.book_id\s*\=\s*\'\d+\'/,
                 `WHERE books.book_id = \'${req.params.bookId}\'`
             )
-        ))[0] as bookType
+        ) as object[])[0] as bookType
 
         if (book) {
             await db(

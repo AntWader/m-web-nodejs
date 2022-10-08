@@ -8,9 +8,15 @@ import * as fs from 'fs';
 
 import { bookType } from "./booksTemplate";
 
-import { db } from './models/db';
+import { db, whiteFilter } from './models/db';
 
-const getBooksStr = fs.readFileSync('./sqlScripts/get_books-page.sql').toString()
+import { cloudinaryUpload } from "./models/uploadImg";
+
+
+const getBooksAdminStr = fs.readFileSync('./sqlScripts/get_books-admin.sql').toString()
+
+const markBookDeleteTime = fs.readFileSync('./sqlScripts/mark-as-delete_books.sql').toString()
+const markBookAuthorLinksDeleteTime = fs.readFileSync('./sqlScripts/mark-as-delete_book_author_id.sql').toString()
 
 export const routerAdmin = express.Router()
 
@@ -51,15 +57,43 @@ routerAdmin.get('/', jsonParser, authentication, async function (req, res) {
 
 routerAdmin.get('/api/v1/books', jsonParser, async function (req, res) {
     try {
-        let books = await db(getBooksStr) as bookType[]
+        let booksAdmin = await db(getBooksAdminStr) as
+            bookType[] & { views: number, clicks: number, delete_time: string }
 
-        res.send(JSON.stringify(books))
+        res.send(JSON.stringify(booksAdmin))
     } catch (e) {
         console.log(e);
         res.status(500).send({ error: "...." }); //ERROR 500 server error
     }
 });
 
+// marks book's delete time
+routerAdmin.get('/api/v1/book/:bookId', jsonParser, async function (req, res) {
+    try {
+        console.log(`book with id:${req.params.bookId} will be deleted after 5 days`)
+
+        await db(markBookDeleteTime.replace(
+            /book_id\s*\=\s*\'\d+\'/,
+            `book_id = \'${req.params.bookId}\'`
+        ))
+        await db(markBookAuthorLinksDeleteTime.replace(
+            /book_id\s*\=\s*\'\d+\'/,
+            `book_id = \'${req.params.bookId}\'`
+        ))
+
+        let adminUrl =
+            req.protocol + '://' + req.get('host') +
+            req.originalUrl.replace(`/api/v1/book/${req.params.bookId}`, '');
+
+        res.writeHead(302, {
+            Location: adminUrl
+        }).end();
+
+    } catch (e) {
+        console.log(e);
+        res.status(500).send({ error: "...." }); //ERROR 500 server error
+    }
+});
 
 const storage = multer.diskStorage({
     destination: 'uploads/',
@@ -70,15 +104,105 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage })
 
+const addNewBook = fs.readFileSync('./sqlScripts/add_new-book.sql').toString()
+const findAuthor = fs.readFileSync('./sqlScripts/find_author-name.sql').toString()
+const addNewAuthor = fs.readFileSync('./sqlScripts/add_new-authors.sql').toString()
+const addNewBookAuthorLinks = fs.readFileSync('./sqlScripts/add_new-book_author_id.sql').toString()
+
 routerAdmin.post('/api/v1/book', jsonParser, upload.single("img"), async function (req, res) {
     try {
         console.log(req.body)
         console.log(req.file)
+        console.log(req.file?.path)
 
-        //cloudinaryUpload(req.file?.path)
+
+        async function addBook() {
+            let cloudinaryResponse = req.file ? await cloudinaryUpload(req.file?.path) : null;
+            console.log(cloudinaryResponse?.secure_url)
+
+            let answerBooks = await db(addNewBook
+                .replace(/\'year\'/, req.body.year ? `\'${req.body.year}\'` : 'NULL')
+                .replace(/\'pages\'/, req.body.pages ? `\'${req.body.pages}\'` : 'NULL')
+                .replace(/\'isbn\'/, req.body.isbn ? `\'${req.body.isbn}\'` : 'NULL')
+                .replace(/\'img\'/, cloudinaryResponse ? `\'${cloudinaryResponse.secure_url}\'` : 'NULL')
+                .replace(/\'title\'/, req.body.title ? `\'${req.body.title}\'` : 'NULL')
+                .replace(/\'description\'/, req.body.description ? `\'${req.body.description}\'` : 'NULL')
+            ) as { insertId: number } & Record<string, any>
+            console.log(answerBooks)
+
+            return answerBooks.insertId
+        }
+
+        type authorsType = { author_id: number, author: string }[]
+
+        async function findAuthorsByName(authors: string[]) {
+            let authorId = await db(findAuthor
+                .replace(/WHERE\s+author\s*=\s*\'author\'/,
+                    `WHERE ${authors.map(a => `author = \'${a}\'`).join(' OR ')}`)
+            ) as authorsType
+            console.log(authorId)
+
+            return authorId
+        }
+
+        async function addAuthors(authors: string[]) {
+            let answerAuthors = await db(addNewAuthor
+                .replace(/\(\'author\'\)/,
+                    `${authors.map(a => `\(\'${a}\'\)`).join(', ')}`)
+            ) as { insertId: number } & Record<string, any>
+
+            console.log(answerAuthors)
+
+            let newAuthors = authors.map((el, ind) => {
+                return { author_id: answerAuthors.insertId + ind, author: el }
+            }) as authorsType
+            console.log(newAuthors)
+
+            return newAuthors
+        }
+
+        async function addBookAuthorLinks(bookId: number, authorsId: number[]) {
+            let send = `${authorsId.map(aId => `\(\'${aId}\', \'${bookId}\'\)`).join(', ')}`
+            let answer = await db(addNewBookAuthorLinks
+                .replace(/\(\s*\'\d+\'\s*,\s*\'\d+\'\s*\)/, send)
+            )
+            console.log('addBookAuthorLinks')
+            console.log(send)
+            console.log(answer)
+        }
+
+        // authors names list
+        let authors = req.body.authors as string[]
+
+        if (
+            /[^\d]+/.test(req.body.year) ||
+            /[^\d]+/.test(req.body.pages) ||
+            /[^\d]+/.test(req.body.isbn) ||
+            whiteFilter.test(req.body.title) ||
+            whiteFilter.test(req.body.description) ||
+            authors.map(a => /[^\w\s\.а-яА-ЯіІїЇєЄ]/g.test(a)).includes(true)
+        ) {
+            console.log('Error')
+            res.status(404).send({ error: "...." }); //ERROR 400 bad request
+        }
+
+        // // found authors object list: {author_id: number, author: string}[]
+        // let existAuthors = await findAuthorsByName(authors)
+
+        // // successfully added authors object list: {author_id: number, author: string}[]
+        // let newAuthors = await addAuthors(authors
+        //     .filter(a => !existAuthors.some(auth => auth.author === a)))
+
+        // // all book authors object list: {author_id: number, author: string}[]
+        // let bookAuthors = existAuthors.concat(newAuthors)
+        // console.log(bookAuthors)
+
+        // let bookId = await addBook()
+        // await addBookAuthorLinks(bookId, bookAuthors.map(a => a.author_id))
 
         let adminUrl =
-            req.protocol + '://' + req.get('host') + req.originalUrl.replace('/api/v1/book', '');
+            req.protocol + '://' + req.get('host') +
+            req.originalUrl.replace('/api/v1/book', '');
 
         res.writeHead(302, {
             Location: adminUrl
