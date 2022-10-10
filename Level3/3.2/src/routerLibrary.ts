@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 
+import * as path from 'path';
 import * as fs from 'fs';
 
 import querystring from 'querystring';
@@ -11,15 +12,15 @@ import { makeBookPage } from "./bookTemplate";
 import { db, whiteFilter } from './models/db';
 
 
-const getBookStr = fs.readFileSync('./sqlScripts/get_book-page.sql').toString()
+const getBookStr = fs.readFileSync(path.join(__dirname, '../sqlScripts/get_book-page.sql')).toString()
 
-const booksSearchStr = fs.readFileSync('./sqlScripts/search_str_books-page.sql').toString()
-const booksSearchAuthor = fs.readFileSync('./sqlScripts/search_str_books-page_author_id.sql').toString()
-const booksSearchYear = fs.readFileSync('./sqlScripts/search_str_books-page_year.sql').toString()
+const booksSearchStr = fs.readFileSync(path.join(__dirname, '../sqlScripts/search_str_books-page.sql')).toString()
+const booksSearchAuthor = fs.readFileSync(path.join(__dirname, '../sqlScripts/search_str_books-page_author_id.sql')).toString()
+const booksSearchYear = fs.readFileSync(path.join(__dirname, '../sqlScripts/search_str_books-page_year.sql')).toString()
 
-const updateBookViews = fs.readFileSync('./sqlScripts/update_books_views.sql').toString()
+const updateBookViews = fs.readFileSync(path.join(__dirname, '../sqlScripts/update_books_views.sql')).toString()
 
-const updateBookClicks = fs.readFileSync('./sqlScripts/update_books_clicks.sql').toString()
+const updateBookClicks = fs.readFileSync(path.join(__dirname, '../sqlScripts/update_books_clicks.sql')).toString()
 
 export const routerLibrary = express.Router()
 

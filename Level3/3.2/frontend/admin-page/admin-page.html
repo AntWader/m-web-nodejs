@@ -72,10 +72,15 @@
                     <div class="col-md-6">
                         <div class="form-row">
                             <div class="col-md-12 mb-3">
-                                <input type="text" name="title" class="form-control" id="validationBookName"
-                                    placeholder="Book title*" required>
-                                <div class="valid-tooltip">
-                                    Looks good!
+                                <input type="text" name="title" class="form-control" id="validationTitle"
+                                    placeholder="Book title*"
+                                    oninput='validateRow(/[^\w\s\-\+\,\.\!\?\:\#а-яА-ЯіІїЇєЄ]/g,"#validationTitle")'
+                                    required>
+                                <div class="valid-feedback">
+                                    Ok
+                                </div>
+                                <div class="invalid-feedback">
+                                    Allowed only letters and +-,.:# symbols.
                                 </div>
                             </div>
                         </div>
@@ -83,9 +88,12 @@
                         <div class="form-row">
                             <div class="col-md-12 mb-3">
                                 <input type="text" name="isbn" class="form-control" id="validationBookIsbn"
-                                    placeholder="isbn" required>
-                                <div class="valid-tooltip">
-                                    Looks good!
+                                    placeholder="isbn" oninput='validateRow(/[^\d\-]/g,"#validationBookIsbn")' required>
+                                <div class="valid-feedback">
+                                    Ok
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please type number code.
                                 </div>
                             </div>
                         </div>
@@ -93,16 +101,22 @@
                         <div class="form-row">
                             <div class="col-md-4 mb-3">
                                 <input type="text" name="year" class="form-control" id="validationBookYear"
-                                    placeholder="year" required>
-                                <div class="valid-tooltip">
-                                    Looks good!
+                                    placeholder="year" oninput='validateRow(/[^\d]+/,"#validationBookYear")' required>
+                                <div class="valid-feedback">
+                                    Ok
+                                </div>
+                                <div class="invalid-feedback">
+                                    Number required.
                                 </div>
                             </div>
                             <div class="col-md-8 mb-3">
                                 <input type="text" name="pages" class="form-control" id="validationBookPages"
-                                    placeholder="pages" required>
-                                <div class="valid-tooltip">
-                                    Looks good!
+                                    placeholder="pages" oninput='validateRow(/[^\d]+/,"#validationBookPages")' required>
+                                <div class="valid-feedback">
+                                    Ok
+                                </div>
+                                <div class="invalid-feedback">
+                                    Number required.
                                 </div>
                             </div>
                         </div>
@@ -112,7 +126,7 @@
                                 <input type="file" name="img" accept="image/png, image/gif, image/jpeg"
                                     class="form-control" id="validationBookImg">
                                 <div class="valid-feedback">
-                                    Correct type.
+                                    Ok
                                 </div>
                                 <div class="invalid-feedback">
                                     Please choose png, gif, jpeg image type.
@@ -125,37 +139,19 @@
                                 <img id="formBookImg" src="#" style="width:168px;" alt="Image missing" />
                             </div>
                         </div>
-
-                        <script>
-                            function validateImg() {
-                                var ext = $("#validationBookImg").val().split('.').pop();
-
-                                if (/(png|jpeg|jpg|gif)/.test(ext)) {
-                                    $("#validationBookImg").removeClass("is-invalid");
-                                    $("#validationBookImg").addClass("is-valid");
-                                } else {
-                                    $("#validationBookImg").removeClass("is-valid");
-                                    $("#validationBookImg").addClass("is-invalid");
-                                }
-                            }
-                            validationBookImg.onchange = evt => {
-                                const [file] = validationBookImg.files
-                                if (file) {
-                                    formBookImg.src = URL.createObjectURL(file)
-                                }
-
-                                validateImg();
-                            }
-                        </script>
                     </div>
 
                     <div class="col-md-6" id="form-second-col">
                         <div class="form-row">
                             <div class="col-md-12 mb-3">
                                 <input type="text" name="authors[0]" class="form-control" id="validationAuthor0"
-                                    placeholder="Author name*" required>
-                                <div class="valid-tooltip">
-                                    Looks good!
+                                    placeholder="Author name*"
+                                    oninput='validateRow(/[^\w\s\.а-яА-ЯіІїЇєЄ]/g,"#validationAuthor0")' required>
+                                <div class="valid-feedback">
+                                    Ok
+                                </div>
+                                <div class="invalid-feedback">
+                                    Allowed only letters and . symbol.
                                 </div>
                             </div>
                         </div>
@@ -174,9 +170,13 @@
                         <div class="form-row">
                             <div class="col-md-12 mb-3">
                                 <textarea class="form-control" rows="8" id="validationDescription" name="description"
-                                    placeholder="Description of the book..."></textarea>
-                                <div class="valid-tooltip">
-                                    Looks good!
+                                    placeholder="Description of the book..."
+                                    oninput='validateRow(/[^\w\s\-\+\,\.\!\?\:\#а-яА-ЯіІїЇєЄ]/g,"#validationDescription")'></textarea>
+                                <div class="valid-feedback">
+                                    Ok
+                                </div>
+                                <div class="invalid-feedback">
+                                    Allowed only letters and +-,.:# symbols.
                                 </div>
                             </div>
                         </div>
@@ -185,7 +185,8 @@
 
                 <div class="form-row align-items-center">
                     <div class="col-md-12 mb-3">
-                        <button class="btn btn-primary" type="submit">Submit form</button>
+                        <button class="btn btn-primary" type="submit" id="submitAdminForm" disabled>Submit
+                            form</button>
                     </div>
                 </div>
             </form>
@@ -199,14 +200,76 @@
                         `<div class="form-row">
                                     <div class="col-md-12 mb-3">
                                         <input type="text" name="authors[${newAuthorsCount}]" class="form-control"
-                                            id="validationAuthor${newAuthorsCount}" placeholder="Author №${newAuthorsCount + 1} name" required>
-                                        <div class="valid-tooltip">
-                                            Looks good!
-                                        </div>
+                                            id="validationAuthor${newAuthorsCount}" 
+                                            placeholder="Author №${newAuthorsCount + 1} name" 
+                                            oninput='validateRow(/[^\\w\\s\\.\\!\\?а-яА-ЯіІїЇєЄ]/g,"#validationAuthor${newAuthorsCount}")' required>
+                                <div class="valid-feedback">
+                                    Ok
+                                </div>
+                                <div class="invalid-feedback">
+                                    Allowed only letters and . symbol.
+                                </div>
                                     </div>
                                 </div>
                                 `
                     ).insertBefore('#formAddAuthorRow');
+                }
+
+                // VALIDATION FORM
+                let validationStatus = { '#validationAuthor0': false, '#validationTitle': false };
+
+                function validateRow(regex, id) {
+                    let row = $(id).val();
+
+                    if (regex.test(row)) {
+                        $(id).removeClass("is-valid");
+                        $(id).addClass("is-invalid");
+
+                        validationStatus[id] = false;
+                        updateSubmitButton();
+                    } else {
+                        $(id).removeClass("is-invalid");
+                        $(id).addClass("is-valid");
+
+                        validationStatus[id] = true;
+                        updateSubmitButton();
+                    }
+                }
+
+                //$("#submitAdminForm").prop('aria-disabled', false);
+                function updateSubmitButton() {
+                    if (Object.values(validationStatus).includes(false)) {
+                        $("#submitAdminForm").prop('disabled', true);
+                    } else {
+                        $("#submitAdminForm").prop('disabled', false);
+                    }
+                }
+
+                // VALIDATION FORM IMG
+                function validateImg() {
+                    let ext = $("#validationBookImg").val().split('.').pop();
+
+                    if (/(png|jpeg|jpg|gif)/.test(ext)) {
+                        $("#validationBookImg").removeClass("is-invalid");
+                        $("#validationBookImg").addClass("is-valid");
+
+                        validationStatus["#validationBookImg"] = true;
+                        updateSubmitButton();
+                    } else {
+                        $("#validationBookImg").removeClass("is-valid");
+                        $("#validationBookImg").addClass("is-invalid");
+
+                        validationStatus["#validationBookImg"] = false;
+                        updateSubmitButton();
+                    }
+                }
+                validationBookImg.onchange = evt => {
+                    const [file] = validationBookImg.files
+                    if (file) {
+                        formBookImg.src = URL.createObjectURL(file)
+                    }
+
+                    validateImg();
                 }
             </script>
         </div>
@@ -240,7 +303,7 @@
                 `
                     <tr>
                         <th scope="row">
-                            <img src="${book.img}" alt="img" style="width:28px;height:40px;">
+                            <img src="${book.img}" alt="img" style="width:56px;height:80px;">
                         </th>
                         <th scope="row">${book.id}</th>
                         <td class="text-break" style="max-width: 160px;">${book.title}</td>

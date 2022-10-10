@@ -38,10 +38,10 @@
                                                 e.preventDefault();
 
                                                 let searchVal = $("#search").val();
-                                                if (/[^\w\sа-яА-Я]/g.test(searchVal)) {
+                                                if (/[^\w\s\-\+\,\.\!\?\:\#а-яА-ЯіІїЇєЄ]/g.test(searchVal)) {
                                                     alert('Invalid search string! Try use only letters and digits.')
                                                 } else {
-                                                    window.location.href = `http://localhost:3000/?offset=10&search=${$("#search").val()}`;
+                                                    window.location.href = `http://localhost:3000/?offset=10&search=${searchVal}`;
                                                 }
                                             }
                                         })

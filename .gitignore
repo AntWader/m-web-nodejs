@@ -24,3 +24,5 @@ Level3/3.2/real_estimates.txt
 Level3/3.2/src/test.ts
 Level3/3.2/sqlScripts/help.txt
 Level3/3.2/dist
+Level3/3.2/sqlScripts/test.sql
+Level3/3.2/backups/

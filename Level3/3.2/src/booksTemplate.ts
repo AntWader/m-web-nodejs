@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { db } from './models/db';
+import { db, whiteFilter } from './models/db';
 
 const getBooksStr = fs.readFileSync('./sqlScripts/get_books-page.sql').toString()
 
@@ -65,16 +65,7 @@ export async function makeBooksPage(
         .replace(/[\n\r].*const\s+maxOffset\s*=\s*\d+/, `const maxOffset = ${maxOffset}\n`)
         .replace(/[\n\r].*const\s+minOffset\s*=\s*\d+/, `const minOffset = ${minOffset}\n`)
         .replace(/[\n\r].*const\s+offsetShift\s*=\s*\d+/, `const offsetShift = ${offsetShift}\n`)
-        .replace(/[\n\r].*const\s+offset\s*=\s*\d+/, `const offset = ${Math.min(offset, books.length)}\n`)
-
-    // if (searchSQL) {
-    //     let search = searchSQL.match(/\'\%[\w\sА-я]+\%\'/);
-    //     booksPage = booksPage
-    //         .replace(
-    //             /id=\"search\" type=\"text\" placeholder=\"[\w\sА-я]+\"/,
-    //             `id=\"search\" type=\"text\" placeholder=\"${search ? search[0].replace(/[\'\%]/g, '') : 'error'
-    //             }\"`)
-    // }
+        .replace(/[\n\r].*const\s+offset\s*=\s*\d+/, `const offset = ${offset}\n`)
 
     if (searchPlaceholder) {
         booksPage = booksPage

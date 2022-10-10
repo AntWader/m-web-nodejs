@@ -5,7 +5,7 @@ import { promisify } from 'util';
 /**
  * Regex: /[^\w\s\-\+\,\.а-яА-ЯіІїЇєЄ]/g
  */
-export const whiteFilter = /[^\w\s\-\+\,\.а-яА-ЯіІїЇєЄ]/g
+export const whiteFilter = /[^\w\s\-\+\,\.\!\?\:\#а-яА-ЯіІїЇєЄ]/g
 
 const dbConfig = {
     HOST: "85.10.205.173",
@@ -30,10 +30,8 @@ async function makeConnection() {
     console.log(`Connection state: ${connection.state} \n`, answer)
 }
 
-makeConnection()
-
 export async function db(command: string) {
-    if (connection.state === 'disconnected') await makeConnection()
+    if (connection.state !== 'authenticated') await makeConnection()
 
     const execute = promisify(connection.query.bind(connection))
 

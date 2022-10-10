@@ -1,2 +1,2 @@
-INSERT INTO authors (author)
+INSERT INTO authors (author) 
 VALUES ('author')
