@@ -178,6 +178,7 @@ routerAdmin.post('/api/v1/book', jsonParser, upload.single("img"), async functio
         // authors names list
         let authors = req.body.authors as string[]
 
+        // VALIDATION body values
         if (
             (/[^\d]+/.test(req.body.year) ||
                 /[^\d]+/.test(req.body.pages) ||
@@ -186,9 +187,9 @@ routerAdmin.post('/api/v1/book', jsonParser, upload.single("img"), async functio
                 whiteFilter.test(req.body.description) ||
                 authors.map(a => /[^\w\s\.а-яА-ЯіІїЇєЄ]/g.test(a)).includes(true)) ||
             (req.body.title === '' || authors[0] === '')
-        ) {
+        ) { // if invalid:
             console.error('Invalid req.body values.')
-        } else {
+        } else { // if valid:
             // found authors object list: {author_id: number, author: string}[]
             let existAuthors = await findAuthorsByName(authors)
 
