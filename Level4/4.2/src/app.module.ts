@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PeopleModule } from './peopleApi/people/people.module';
+import { PeopleModule } from './SWAPIentities/people/people.module';
+import { ApiRouterModule } from './router/router.module';
 
 @Module({
-  imports: [PeopleModule],
+  imports: [ApiRouterModule],
   controllers: [AppController],
   providers: [AppService],
 })
