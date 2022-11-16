@@ -1,14 +1,13 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { PeopleModule } from '../swapi.entities/people/people.module';
 import { RouterModule } from '@nestjs/core';
-import { PeopleImgModule } from 'src/people.img/people.img.module';
-import { PeopleImgController } from 'src/people.img/people.img.controller';
 import { ImgUploader } from 'src/middleware/middleware.img';
-import { PeopleController } from 'src/swapi.entities/people/people.controller';
+import { ImagesModule } from 'src/images/images.module';
+import { ImagesController } from 'src/images/images.controller';
 
 @Module({
   imports: [
-    PeopleModule, PeopleImgModule,
+    PeopleModule, ImagesModule,
     RouterModule.register([
       {
         path: 'people',
@@ -16,7 +15,7 @@ import { PeopleController } from 'src/swapi.entities/people/people.controller';
         children: [
           {
             path: 'img',
-            module: PeopleImgModule,
+            module: ImagesModule,
           }
         ]
       },
@@ -28,6 +27,6 @@ export class ApiRouterModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(ImgUploader)
-      .forRoutes(PeopleImgController);
+      .forRoutes(ImagesController);
   }
 }
