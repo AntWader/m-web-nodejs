@@ -10,4 +10,4 @@ import { DatabaseModule } from 'src/database/database.module';
   controllers: [ImagesController],
   providers: [ImagesService]
 })
-export class ImagesModule { }
+export class ImagesModule {}

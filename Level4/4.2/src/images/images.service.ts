@@ -8,8 +8,7 @@ import { Images } from './entities/image.entity';
 @Injectable()
 export class ImagesService {
   constructor(
-    @InjectRepository(Images)
-    private imgRepository: Repository<Images>,
+    @InjectRepository(Images) private imgRepository: Repository<Images>,
   ) { }
 
   async create(createImageDto: CreateImageDto) {
@@ -19,8 +18,12 @@ export class ImagesService {
     return 'This action adds a new image';
   }
 
-  findAll() {
-    let found = this.imgRepository.find();
+  findAll(entity: string) {
+    let found = this.imgRepository.find({
+      where: {
+        entity: entity,
+      },
+    });
     return found;
 
     //return `This action returns all images`;

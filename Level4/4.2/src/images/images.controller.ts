@@ -10,7 +10,7 @@ import { Request } from 'express';
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) { }
 
-  @Post(':id')
+  @Post(':entity/:id')
   @UseInterceptors(FileInterceptor('img', {
     storage: diskStorage({
       destination: './uploads',
@@ -41,32 +41,46 @@ export class ImagesController {
         ],
       })
     ) file: Express.Multer.File,
+    @Param('entity') entity: string,
     @Param('id', ParseIntPipe) id: number) {
     console.log(`middleware uploading...`);
     console.log(file);
-    let entityName = req.originalUrl.split('/').slice(-3)[0]; // for example: ../NAME/img/1
-    console.log(entityName)
 
-    return this.imagesService.create({ "entity": entityName, "id": id, "src": file.path });
+    // let entityName = req.originalUrl.split('/').slice(-3)[0]; // for example: ../NAME/img/1
+    // console.log(entityName)
+
+    return this.imagesService.create({ "entity": entity, "id": id, "src": file.path });
   }
 
-  @Get()
-  findAll() {
-    return this.imagesService.findAll();
+  @Get(':entity')
+  findAll(
+    @Param('entity') entity: string
+  ) {
+    return this.imagesService.findAll(entity);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(':entity/:id')
+  findOne(
+    @Param('entity') entity: string,
+    @Param('id', ParseIntPipe) id: number
+  ) {
     return this.imagesService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {
+  @Patch(':entity/:id')
+  update(
+    @Param('entity') entity: string,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateImageDto: UpdateImageDto
+  ) {
     return this.imagesService.update(+id, updateImageDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(':entity/:id')
+  remove(
+    @Param('entity') entity: string,
+    @Param('id', ParseIntPipe) id: number
+  ) {
     return this.imagesService.remove(+id);
   }
 }

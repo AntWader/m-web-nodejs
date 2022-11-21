@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Gender } from './gender.entity';
 
 @Entity()
 export class Person {
@@ -26,8 +27,9 @@ export class Person {
     @Column()
     birth_year: string;
 
-    @Column()
-    gender: string;
+    @OneToOne(() => Gender, { cascade: true, })
+    @JoinColumn()
+    gender: Gender;
 
     @Column()
     homeworld: string;
