@@ -1,16 +1,16 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { PeopleModule } from '../swapi/people.module/people.module';
+import { PeopleModule } from '../swapi/people/people.module';
 import { RouterModule } from '@nestjs/core';
 import { ImgUploader } from 'src/middleware/middleware.img';
-import { ImagesModule } from 'src/images/images.module';
-import { ImagesController } from 'src/images/images.controller';
+import { ImagesModule } from 'src/swapi/images/images.module';
+import { ImagesController } from 'src/swapi/images/images.controller';
 
 @Module({
   imports: [
     PeopleModule, ImagesModule,
     RouterModule.register([
       {
-        path: 'people.module',
+        path: 'people',
         module: PeopleModule,
       },
       {
