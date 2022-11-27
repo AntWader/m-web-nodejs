@@ -1,11 +1,11 @@
-import { Injectable, Logger, Type } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BaseEntity, EntitySchema, ObjectLiteral, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreatePersonDto } from '../dto/create-person.dto';
 import { UpdatePersonDto } from '../dto/update-person.dto';
 import { Person } from '../entities/person.entity';
 import { Gender } from '../entities/gender.entity';
-import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type';
+import { Images } from '../entities/image.entity';
 
 /**
  * Removes properties from object.
@@ -60,7 +60,9 @@ function flatten(obj: object) {
   let flatObj: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(obj)) {
-    if (value.id) {
+    if (Array.isArray(value)) {
+      flatObj[key as keyof object] = value.map(val => val.id ? getEntityValue(val) : val);
+    } else if (value.id) {
       flatObj[key as keyof object] = getEntityValue(value);
     } else flatObj[key as keyof object] = value;
   }
@@ -80,46 +82,98 @@ function getEntityValue(entity: object): any {
   }
 }
 
+export function updateEntity(entity: Record<string, any>, updateDto: Record<string, any>) {
+  let updateKeys = Object.keys(updateDto);
+
+  for (const [key, value] of Object.entries(entity)) {
+    if (updateKeys.includes(key)) {
+      entity[key] = updateDto[key];
+    }
+  }
+
+  return entity;
+}
+
 @Injectable()
 export class PeopleService {
   constructor(
     @InjectRepository(Person) private personRepository: Repository<Person>,
     @InjectRepository(Gender) private genderRepository: Repository<Gender>,
+    @InjectRepository(Images) private imgRepository: Repository<Images>,
   ) { }
 
   async create(createPersonDto: CreatePersonDto) {
-    let savePersonDto: Partial<Person> = filterProperty(createPersonDto, ['gender']);
+    let savePerson: Partial<Person> = filterProperty(createPersonDto, ['gender']);
 
-    savePersonDto.gender = await findOrCreateRepository(
+    savePerson.gender = await findOrCreateRepository(
       this.genderRepository,
       { where: { gender: createPersonDto.gender } })
 
-    let person = this.personRepository.create(savePersonDto)
+    let person = this.personRepository.create(savePerson)
     await this.personRepository.save(person);
 
     return 'This action adds a new person';
   }
 
   async findAll() {
-    let found = this.personRepository
+    let people = await this.personRepository
       .createQueryBuilder('person')
       .leftJoinAndSelect('person.gender', 'gender')
+      .leftJoinAndSelect('person.images', 'images')
       .getMany()
-
-    let people = await found;
 
     return people.map(person => flatten(person));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} person`;
+  async findOne(id: number) {
+    let person = await this.personRepository
+      .createQueryBuilder('person')
+      .leftJoinAndSelect('person.gender', 'gender')
+      .leftJoinAndSelect('person.images', 'images')
+      .where({ id: id })
+      .getOne()
+
+    if (person) {
+      return flatten(person);
+    } else throw new BadRequestException(`Person with id:${id} not found.`);
   }
 
-  update(id: number, updatePersonDto: UpdatePersonDto) {
-    return `This action updates a #${id} person`;
+  async update(id: number, updatePersonDto: UpdatePersonDto) {
+    let updatePerson: Partial<Person> = filterProperty(updatePersonDto, ['gender']);
+
+    let person = await this.personRepository
+      .createQueryBuilder('person')
+      .leftJoinAndSelect('person.gender', 'gender')
+      .leftJoinAndSelect('person.images', 'images')
+      .where({ id: id })
+      .getOne()
+
+    if (person) {
+      if (updatePersonDto.gender) {
+        updatePerson.gender = await findOrCreateRepository(
+          this.genderRepository,
+          { where: { gender: updatePersonDto.gender } })
+      }
+
+      await this.personRepository.save(updateEntity(person, updatePerson));
+
+      return `This action updates a #${id} person`;
+    } else throw new BadRequestException(`Person with id:${id} not found.`);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} person`;
+  async remove(id: number) {
+
+    let person = await this.personRepository
+      .createQueryBuilder('person')
+      .leftJoinAndSelect('person.gender', 'gender')
+      .leftJoinAndSelect('person.images', 'images')
+      .where({ id: id })
+      .getOne()
+
+    if (person) {
+      await this.personRepository.remove(person)
+
+      return `This action removes a #${id} person`;
+    } else throw new BadRequestException(`Person with id:${id} not found.`);
   }
 }

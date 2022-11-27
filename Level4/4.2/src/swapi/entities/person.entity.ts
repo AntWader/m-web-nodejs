@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne, OneToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, JoinTable, ManyToMany } from 'typeorm';
 import { Gender } from './gender.entity';
+import { Images } from './image.entity';
 
 @Entity()
 export class Person {
@@ -26,10 +27,6 @@ export class Person {
 
     @Column()
     birth_year: string;
-
-    @ManyToOne(() => Gender, g => g.people, { cascade: ['insert', 'update'], })
-    @JoinColumn()
-    gender: Gender;
 
     @Column()
     homeworld: string;
@@ -64,4 +61,22 @@ export class Person {
 
     @Column()
     url: string;
+
+    @ManyToOne(() => Gender, g => g.people, { cascade: ['insert', 'update'], })
+    @JoinColumn()
+    gender: Gender;
+
+    @ManyToMany(() => Images, { cascade: ['insert', 'update'], })
+    @JoinTable({
+        name: "people_images",
+        joinColumn: {
+            name: "people_id",
+            referencedColumnName: "id"
+        },
+        inverseJoinColumn: {
+            name: "img_id",
+            referencedColumnName: "id"
+        }
+    })
+    images: Images[];
 }
