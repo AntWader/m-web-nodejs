@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGenderDto } from '../dto/create-gender.dto';
-import { UpdateGenderDto } from '../dto/update-gender.dto';
+import { CreateGenderDto } from '../../dto/create-gender.dto';
+import { UpdateGenderDto } from '../../dto/update-gender.dto';
 
 @Injectable()
 export class GendersService {

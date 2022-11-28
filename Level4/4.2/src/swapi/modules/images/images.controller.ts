@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseFilePipe, FileTypeValidator, ParseIntPipe, Req } from '@nestjs/common';
 import { ImagesService } from './images.service';
-import { UpdateImageDto } from '../dto/update-image.dto';
+import { UpdateImageDto } from '../../dto/update-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';

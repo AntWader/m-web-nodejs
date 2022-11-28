@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ApiRouterModule } from './router/router.module';
 
 @Module({
-  imports: [ApiRouterModule],
+  imports: [ApiRouterModule,],
   controllers: [AppController],
   providers: [AppService],
 })

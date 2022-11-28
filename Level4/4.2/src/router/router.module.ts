@@ -1,9 +1,9 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { PeopleModule } from '../swapi/people/people.module';
+import { PeopleModule } from '../swapi/modules/people/people.module';
 import { RouterModule } from '@nestjs/core';
 import { ImgUploader } from 'src/middleware/middleware.img';
-import { ImagesModule } from 'src/swapi/images/images.module';
-import { ImagesController } from 'src/swapi/images/images.controller';
+import { ImagesModule } from 'src/swapi/modules/images/images.module';
+import { ImagesController } from 'src/swapi/modules/images/images.controller';
 
 @Module({
   imports: [

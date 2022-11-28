@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateImageDto } from '../dto/create-image.dto';
-import { UpdateImageDto } from '../dto/update-image.dto';
-import { Images } from '../entities/image.entity';
-import { Person } from '../entities/person.entity';
+import { CreateImageDto } from '../../dto/create-image.dto';
+import { UpdateImageDto } from '../../dto/update-image.dto';
+import { Images } from '../../entities/image.entity';
+import { Person } from '../../entities/person.entity';
 import { updateEntity } from '../people/people.service';
 
 @Injectable()

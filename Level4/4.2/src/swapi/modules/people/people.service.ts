@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreatePersonDto } from '../dto/create-person.dto';
-import { UpdatePersonDto } from '../dto/update-person.dto';
-import { Person } from '../entities/person.entity';
-import { Gender } from '../entities/gender.entity';
-import { Images } from '../entities/image.entity';
+import { CreatePersonDto } from '../../dto/create-person.dto';
+import { UpdatePersonDto } from '../../dto/update-person.dto';
+import { Person } from '../../entities/person.entity';
+import { Gender } from '../../entities/gender.entity';
+import { Images } from '../../entities/image.entity';
 
 /**
  * Removes properties from object.
