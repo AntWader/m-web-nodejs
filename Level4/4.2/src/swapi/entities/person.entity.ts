@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, JoinTable, ManyToMany } from 'typeorm';
+import { Film } from './film.entity';
 import { Gender } from './gender.entity';
 import { Images } from './image.entity';
 
@@ -32,9 +33,6 @@ export class Person {
     homeworld: string;
 
     @Column("simple-array")
-    films: string[];
-
-    @Column("simple-array")
     species: string[];
 
     @Column("simple-array")
@@ -62,11 +60,25 @@ export class Person {
     @Column()
     url: string;
 
-    @ManyToOne(() => Gender, g => g.people, { cascade: ['insert', 'update'], })
+    @ManyToOne(() => Gender, g => g.people, { cascade: ['insert', 'update'], eager: true })
     @JoinColumn()
     gender: Gender;
 
-    @ManyToMany(() => Images, { cascade: ['insert', 'update'], })
+    @ManyToMany(() => Film, { cascade: ['insert', 'update'], eager: true })
+    @JoinTable({
+        name: "people_films",
+        joinColumn: {
+            name: "people_id",
+            referencedColumnName: "id"
+        },
+        inverseJoinColumn: {
+            name: "film_id",
+            referencedColumnName: "id"
+        }
+    })
+    films: Film[];
+
+    @ManyToMany(() => Images, { cascade: ['insert', 'update'], eager: true })
     @JoinTable({
         name: "people_images",
         joinColumn: {

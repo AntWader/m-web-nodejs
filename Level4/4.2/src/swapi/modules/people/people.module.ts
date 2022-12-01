@@ -6,9 +6,10 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { Person } from "../../entities/person.entity";
 import { Gender } from "../../entities/gender.entity";
 import { Images } from "../../entities/image.entity";
+import { Film } from "src/swapi/entities/film.entity";
 
 @Module({
-  imports: [DatabaseModule, TypeOrmModule.forFeature([Person, Gender, Images])],
+  imports: [DatabaseModule, TypeOrmModule.forFeature([Person, Gender, Images, Film])],
   controllers: [PeopleController],
   providers: [PeopleService]
 })

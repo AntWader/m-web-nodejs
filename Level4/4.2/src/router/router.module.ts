@@ -12,13 +12,12 @@ import { ImagesController } from 'src/swapi/modules/images/images.controller';
       {
         path: 'people',
         module: PeopleModule,
-        children: [
-          {
-            path: 'img',
-            module: ImagesModule,
-          },
-        ]
-      }
+        children: []
+      },
+      {
+        path: 'img/people',
+        module: ImagesModule,
+      },
     ]),
   ],
 })

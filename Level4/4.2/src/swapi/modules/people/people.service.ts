@@ -6,6 +6,7 @@ import { UpdatePersonDto } from '../../dto/update-person.dto';
 import { Person } from '../../entities/person.entity';
 import { Gender } from '../../entities/gender.entity';
 import { Images } from '../../entities/image.entity';
+import { Film } from 'src/swapi/entities/film.entity';
 
 /**
  * Removes properties from object.
@@ -28,26 +29,26 @@ export function filterProperty(dto: Object, prop: string[]) {
 }
 
 /**
- * Finds first match entity instance or create new.
+ * Finds first match entity instance or create new. 
+ * If find option defined as {id:number} and entity was not found, throws BadRequestException!
  * 
  * @param rep Repository which is supposed to work with entity objects
  * @param findOption conditions by which entity should be queried, example {where:{id:1}}
  * @returns entity instance
  */
 export async function findOrCreateRepository(
-  rep: Repository<any>,
-  findOption: { where: Record<string, any> }
+  rep: repositoryType,
+  findOption: { where: entityType }
 ) {
-  let findRep: any[] = await rep.find(findOption);
-  let newRep: any;
+  let findRep: any = await rep.findOne(findOption);
 
-  if (findRep.length < 1) {
-    newRep = rep.create(findOption.where);
+  if (findRep) {
+    return findRep
   } else {
-    newRep = findRep[0];
-  }
+    if (findOption.where.id) throw new BadRequestException(`${rep.target} with id:${findOption.where.id} not found.`);
 
-  return newRep;
+    return rep.create(findOption.where);
+  }
 }
 
 /**
@@ -82,7 +83,7 @@ function getEntityValue(entity: object): any {
   }
 }
 
-export function updateEntity(entity: Record<string, any>, updateDto: Record<string, any>) {
+export function replaceProperties(entity: Record<string, any>, updateDto: Record<string, any>) {
   let updateKeys = Object.keys(updateDto);
 
   for (const [key, value] of Object.entries(entity)) {
@@ -94,81 +95,179 @@ export function updateEntity(entity: Record<string, any>, updateDto: Record<stri
   return entity;
 }
 
+type entityType = Record<string, any>;
+type repositoryType = Repository<entityType>;
+
+async function fillRelationsDto(
+  dto: entityType,
+  relations: { repository: repositoryType, property: string, column: string }[],
+) {
+
+  let newObj: entityType = {};
+  for (let i = 0; i < relations.length; i++) {
+    let repository = relations[i].repository;
+    let propertyValue = dto[relations[i].property];
+
+    if (propertyValue) {
+      // search entity by id or by column value
+      let search = (entityValue: any) => entityValue.id ? { id: entityValue.id } : { [relations[i].column]: entityValue };
+
+      if (Array.isArray(propertyValue)) {
+        newObj[relations[i].property] = [];
+        for (let j = 0; j < propertyValue.length; j++) {
+          console.log('hello \#3')
+          let findEntity = await findOrCreateRepository(repository, { where: search(propertyValue[j]) });
+          newObj[relations[i].property].push(findEntity);
+        }
+      } else {
+        console.log('hello \#4')
+        newObj[relations[i].property] = await findOrCreateRepository(repository, { where: search(propertyValue) });
+      }
+    }
+  }
+
+  return newObj;
+}
+
+async function createEntity(
+  entityRepository: repositoryType,
+  dto: entityType,
+  relations?: { repository: repositoryType, property: string, column: string }[],
+) {
+  let entityProperties: Partial<entityType>;
+  let relationsProperties: Partial<entityType>;
+
+  if (relations) {
+    entityProperties = filterProperty(dto, relations.map(relation => relation.property));
+    relationsProperties = await fillRelationsDto(dto, relations);
+  } else {
+    entityProperties = dto;
+    relationsProperties = {};
+  }
+
+  let entity = entityRepository.create({ ...entityProperties, ...relationsProperties })
+  await entityRepository.save(entity);
+
+  return `This action adds a new ${entityRepository.target}`;
+}
+
+async function updateEntity(
+  entityId: number,
+  entityRepository: repositoryType,
+  dto: entityType,
+  relations?: { repository: repositoryType, property: string, column: string }[],
+) {
+  let entity = await entityRepository.findOne({ where: { id: entityId } });
+  let updateProperties: Partial<entityType>;
+  let updateRelations: Partial<entityType>;
+
+  if (relations) {
+    updateProperties = filterProperty(dto, relations.map(relation => relation.property));
+    console.log('hello')
+    updateRelations = await fillRelationsDto(dto, relations);//!!!!!!!!!!!!!
+    console.log('hello \#2')
+  } else {
+    updateProperties = dto;
+    updateRelations = {};
+  }
+
+  if (entity) {
+    await entityRepository.save(replaceProperties(entity, { ...updateProperties, ...updateRelations }));
+
+    return `This action adds a new ${entityRepository.target}`;
+  } else throw new BadRequestException(`Person with id:${entityId} not found.`);
+}
+
 @Injectable()
 export class PeopleService {
   constructor(
     @InjectRepository(Person) private personRepository: Repository<Person>,
     @InjectRepository(Gender) private genderRepository: Repository<Gender>,
+    @InjectRepository(Film) private filmRepository: Repository<Film>,
     @InjectRepository(Images) private imgRepository: Repository<Images>,
   ) { }
 
   async create(createPersonDto: CreatePersonDto) {
-    let savePerson: Partial<Person> = filterProperty(createPersonDto, ['gender']);
+    return await createEntity(
+      this.personRepository,
+      createPersonDto,
+      [
+        { repository: this.genderRepository, property: 'gender', column: 'gender' },
+        { repository: this.filmRepository, property: 'films', column: 'film' },
+      ]);
 
-    savePerson.gender = await findOrCreateRepository(
-      this.genderRepository,
-      { where: { gender: createPersonDto.gender } })
+    // let savePerson: Partial<Person> = filterProperty(createPersonDto, ['gender']);
 
-    let person = this.personRepository.create(savePerson)
-    await this.personRepository.save(person);
+    // savePerson.gender = await findOrCreateRepository(
+    //   this.genderRepository,
+    //   { where: { gender: createPersonDto.gender } })
 
-    return 'This action adds a new person';
+    // let person = this.personRepository.create(savePerson)
+    // await this.personRepository.save(person);
+
+    // return 'This action adds a new person';
   }
 
   async findAll() {
-    let people = await this.personRepository
-      .createQueryBuilder('person')
-      .leftJoinAndSelect('person.gender', 'gender')
-      .leftJoinAndSelect('person.images', 'images')
-      .getMany()
+    let people = await this.personRepository.find();
 
-    return people.map(person => flatten(person));
+    // let people = await this.personRepository
+    //   .createQueryBuilder('person')
+    //   .leftJoinAndSelect('person.gender', 'gender')
+    //   .leftJoinAndSelect('person.images', 'images')
+    //   .getMany()
+
+    // return people.map(person => flatten(person));
+    return people;
   }
 
   async findOne(id: number) {
-    let person = await this.personRepository
-      .createQueryBuilder('person')
-      .leftJoinAndSelect('person.gender', 'gender')
-      .leftJoinAndSelect('person.images', 'images')
-      .where({ id: id })
-      .getOne()
+    let person = await this.personRepository.findOne({ where: { id: id } });
+
+    // let person = await this.personRepository
+    //   .createQueryBuilder('person')
+    //   .leftJoinAndSelect('person.gender', 'gender')
+    //   .leftJoinAndSelect('person.images', 'images')
+    //   .where({ id: id })
+    //   .getOne()
 
     if (person) {
-      return flatten(person);
+      // return flatten(person);
+      return person;
     } else throw new BadRequestException(`Person with id:${id} not found.`);
   }
 
   async update(id: number, updatePersonDto: UpdatePersonDto) {
-    let updatePerson: Partial<Person> = filterProperty(updatePersonDto, ['gender']);
+    return await updateEntity(
+      id,
+      this.personRepository,
+      updatePersonDto,
+      [
+        { repository: this.genderRepository, property: 'gender', column: 'gender' },
+        { repository: this.filmRepository, property: 'films', column: 'film' },
+        { repository: this.imgRepository, property: 'images', column: 'src' },
+      ]);
 
-    let person = await this.personRepository
-      .createQueryBuilder('person')
-      .leftJoinAndSelect('person.gender', 'gender')
-      .leftJoinAndSelect('person.images', 'images')
-      .where({ id: id })
-      .getOne()
+    // let updatePerson: Partial<Person> = filterProperty(updatePersonDto, ['gender']);
 
-    if (person) {
-      if (updatePersonDto.gender) {
-        updatePerson.gender = await findOrCreateRepository(
-          this.genderRepository,
-          { where: { gender: updatePersonDto.gender } })
-      }
+    // let person = await this.personRepository.findOne({ where: { id: id } });
 
-      await this.personRepository.save(updateEntity(person, updatePerson));
+    // if (person) {
+    //   if (updatePersonDto.gender) {
+    //     updatePerson.gender = await findOrCreateRepository(
+    //       this.genderRepository,
+    //       { where: { gender: updatePersonDto.gender } })
+    //   }
 
-      return `This action updates a #${id} person`;
-    } else throw new BadRequestException(`Person with id:${id} not found.`);
+    //   await this.personRepository.save(replaceProperties(person, updatePerson));
+
+    //   return `This action updates a #${id} person`;
+    // } else throw new BadRequestException(`Person with id:${id} not found.`);
   }
 
   async remove(id: number) {
 
-    let person = await this.personRepository
-      .createQueryBuilder('person')
-      .leftJoinAndSelect('person.gender', 'gender')
-      .leftJoinAndSelect('person.images', 'images')
-      .where({ id: id })
-      .getOne()
+    let person = await this.personRepository.findOne({ where: { id: id } });
 
     if (person) {
       await this.personRepository.remove(person)

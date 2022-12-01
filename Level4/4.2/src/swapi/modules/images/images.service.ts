@@ -5,7 +5,7 @@ import { CreateImageDto } from '../../dto/create-image.dto';
 import { UpdateImageDto } from '../../dto/update-image.dto';
 import { Images } from '../../entities/image.entity';
 import { Person } from '../../entities/person.entity';
-import { updateEntity } from '../people/people.service';
+import { replaceProperties } from '../people/people.service';
 
 @Injectable()
 export class ImagesService {
@@ -14,13 +14,21 @@ export class ImagesService {
     @InjectRepository(Person) private personRepository: Repository<Person>,
   ) { }
 
-  async create(entityId: number, createImageDto: CreateImageDto) {
+  async create(createImageDto: CreateImageDto) {
+    let img = this.imgRepository.create(createImageDto);
+
+    let result = await this.imgRepository.save(img);
+    console.log(result)
+    return `This action adds a new image`;
+  }
+
+  async createAndLink(entityId: number, createImageDto: CreateImageDto) {
     let person = await this.personRepository
       .createQueryBuilder('person')
       .leftJoinAndSelect('person.images', 'images')
       .getOne()
 
-    console.log(person)
+    //console.log(person)
 
     if (person) {
       person.images.push(this.imgRepository.create(createImageDto))
@@ -36,7 +44,7 @@ export class ImagesService {
     //return `This action returns all images`;
   }
 
-  findForOneEntity(id: number) {
+  findOne(id: number) {
     let found = this.imgRepository.find({ where: { id: id } });
     return found;
 
@@ -50,7 +58,7 @@ export class ImagesService {
       .getOne()
 
     if (img) {
-      await this.imgRepository.save(updateEntity(img, updateImageDto));
+      await this.imgRepository.save(replaceProperties(img, updateImageDto));
       return `This action updates a #${id} image`;
     } else throw new BadRequestException(`Person with id:${id} not found.`);
   }
