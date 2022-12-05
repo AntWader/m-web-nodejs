@@ -1,9 +1,8 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { PeopleModule } from '../swapi/modules/people/people.module';
-import { RouterModule } from '@nestjs/core';
-import { ImgUploader } from 'src/middleware/middleware.img';
+import { APP_INTERCEPTOR, RouterModule } from '@nestjs/core';
 import { ImagesModule } from 'src/swapi/modules/images/images.module';
-import { ImagesController } from 'src/swapi/modules/images/images.controller';
+import { TransformInterceptor } from 'src/middleware/transform.interceptor';
 
 @Module({
   imports: [
@@ -19,6 +18,12 @@ import { ImagesController } from 'src/swapi/modules/images/images.controller';
         module: ImagesModule,
       },
     ]),
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
   ],
 })
 export class ApiRouterModule { }

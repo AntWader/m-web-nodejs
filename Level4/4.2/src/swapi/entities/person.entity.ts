@@ -1,12 +1,20 @@
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, JoinTable, ManyToMany } from 'typeorm';
 import { Film } from './film.entity';
 import { Gender } from './gender.entity';
-import { Images } from './image.entity';
+import { Image } from './image.entity';
+import { Planet } from './planet.entity';
+import { Species } from './species.entity';
+import { Starship } from './starship.entity';
+import { Vehicle } from './vehicle.entity';
 
 @Entity()
 export class Person {
     @PrimaryGeneratedColumn()
     id: number;
+
+    @ManyToMany(() => Image, { cascade: ['insert', 'update'], eager: true })
+    @JoinTable()
+    images: Image[];
 
     @Column()
     name: string;
@@ -29,17 +37,29 @@ export class Person {
     @Column()
     birth_year: string;
 
-    @Column()
-    homeworld: string;
+    @ManyToOne(() => Gender, g => g.people, { cascade: ['insert', 'update'], eager: true })
+    @JoinColumn()
+    gender: Gender;
 
-    @Column("simple-array")
-    species: string[];
+    @ManyToOne(() => Planet, g => g.residents,)
+    @JoinColumn()
+    homeworld: Planet;
 
-    @Column("simple-array")
-    vehicles: string[];
+    @ManyToMany(() => Film,)
+    @JoinTable()
+    films: Film[];
 
-    @Column("simple-array")
-    starships: string[];
+    @ManyToMany(() => Species,)
+    @JoinTable()
+    species: Species[];
+
+    @ManyToMany(() => Vehicle,)
+    @JoinTable()
+    vehicles: Vehicle[];
+
+    @ManyToMany(() => Starship,)
+    @JoinTable()
+    starships: Starship[];
 
     @Column("timestamp", {
         transformer: {
@@ -59,36 +79,4 @@ export class Person {
 
     @Column()
     url: string;
-
-    @ManyToOne(() => Gender, g => g.people, { cascade: ['insert', 'update'], eager: true })
-    @JoinColumn()
-    gender: Gender;
-
-    @ManyToMany(() => Film, { cascade: ['insert', 'update'], eager: true })
-    @JoinTable({
-        name: "people_films",
-        joinColumn: {
-            name: "people_id",
-            referencedColumnName: "id"
-        },
-        inverseJoinColumn: {
-            name: "film_id",
-            referencedColumnName: "id"
-        }
-    })
-    films: Film[];
-
-    @ManyToMany(() => Images, { cascade: ['insert', 'update'], eager: true })
-    @JoinTable({
-        name: "people_images",
-        joinColumn: {
-            name: "people_id",
-            referencedColumnName: "id"
-        },
-        inverseJoinColumn: {
-            name: "img_id",
-            referencedColumnName: "id"
-        }
-    })
-    images: Images[];
 }

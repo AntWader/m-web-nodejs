@@ -1,9 +1,10 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Film } from "./film.entity";
-import { Person } from "./person.entity";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Film } from './film.entity';
+import { Person } from './person.entity';
+import { Species } from './species.entity';
 
 @Entity()
-export class Starship {
+export class Planet {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -11,43 +12,34 @@ export class Starship {
     name: string;
 
     @Column()
-    model: string;
+    rotation_period: number;
 
     @Column()
-    manufacturer: string;
+    orbital_period: number;
 
     @Column()
-    cost_in_credits: number;
+    diameter: number;
 
     @Column()
-    length: number;
+    climate: string;
 
     @Column()
-    max_atmosphering_speed: number;
+    gravity: string;
 
     @Column()
-    crew: string;
+    terrain: string;
 
     @Column()
-    passengers: number;
+    surface_water: number;
 
     @Column()
-    cargo_capacity: number;
+    population: number;
 
-    @Column()
-    consumables: string;
+    @OneToMany(() => Species, s => s.homeworld,)
+    species: Species[];
 
-    @Column("decimal")
-    hyperdrive_rating: number;
-
-    @Column()
-    MGLT: number;
-
-    @Column()
-    starship_class: string;
-
-    @ManyToMany(() => Person,)
-    pilots: Person[];
+    @OneToMany(() => Person, p => p.homeworld,)
+    residents: Person[];
 
     @ManyToMany(() => Film,)
     @JoinTable()

@@ -9,6 +9,6 @@ export class Gender {
     @Column()
     gender: string;
 
-    @OneToMany(() => Person, p => p.gender)
+    @OneToMany(() => Person, p => p.gender,)
     people: Person[];
 }

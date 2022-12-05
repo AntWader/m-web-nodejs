@@ -56,9 +56,6 @@ export class ImagesController {
     @Param('id', ParseIntPipe) id: number) {
     console.log(file);
 
-    // let entityName = req.originalUrl.split('/').slice(-3)[0]; // for example: ../NAME/img/1
-    // console.log(entityName)
-
     return this.imagesService.createAndLink(id, { src: file.path });
   }
 
