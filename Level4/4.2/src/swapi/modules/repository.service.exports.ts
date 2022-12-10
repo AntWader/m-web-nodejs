@@ -56,28 +56,26 @@ function filterProperty(dto: Object, prop: string[]) {
 
 async function fillRelationsDto(
     dto: entityType,
-    relations: relationType[],
+    config: relationType[],
 ) {
 
     let newObj: entityType = {};
-    for (let i = 0; i < relations.length; i++) {
-        //let repository = relations[i].repository;
-
-        const propertyName = relations[i].property;
+    for (let i = 0; i < config.length; i++) {
+        const propertyName = config[i].property;
         let propertyValue = dto[propertyName];
 
         if (propertyValue) {
             // creates search config, with entity search by id or by column value
-            let search = (entityValue: any) => entityValue.id ? { id: entityValue.id } : { [relations[i].column]: entityValue };
+            let search = (entityValue: any) => entityValue.id ? { id: entityValue.id } : { [config[i].column]: entityValue };
 
             if (Array.isArray(propertyValue)) {
                 newObj[propertyName] = [];
                 for (let j = 0; j < propertyValue.length; j++) {
-                    let findEntity = await findOrCreateRepository(relations[i], { where: search(propertyValue[j]) });
+                    let findEntity = await findOrCreateRepository(config[i], { where: search(propertyValue[j]) });
                     newObj[propertyName].push(findEntity);
                 }
             } else {
-                newObj[propertyName] = await findOrCreateRepository(relations[i], { where: search(propertyValue) });
+                newObj[propertyName] = await findOrCreateRepository(config[i], { where: search(propertyValue) });
             }
         }
     }
@@ -159,6 +157,60 @@ export async function removeEntity(entityId: number, entityRepository: repositor
     if (entity) {
         await entityRepository.remove(entity)
 
-        return `This action removes a #${entityId} entity`;
+        return `This action removes entity ${entityRepository.metadata.targetName} with id:${entityId}.`;
     } else throw new BadRequestException(`${entityRepository.metadata.targetName} with id:${entityId} not found.`);
+}
+
+/**
+ * Replaces relation entities objects by relationsConfig column value corresponding to property name within it.
+ * 
+ * @param obj entity object
+ * @param relationsConfig relations config
+ * @returns entity object with entity values replaced by entity first column (except id) value.
+ */
+export function flatten(obj: object, relationsConfig: relationType[]) {
+    let flatObj: Record<string, any> = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+        if (value) { // in case: value = null
+            if (Array.isArray(value)) {
+                flatObj[key as keyof object] = value.map(val => getEntityColumn(key, val, relationsConfig));
+            } else {
+                flatObj[key as keyof object] = getEntityColumn(key, value, relationsConfig);
+            }
+        } else {
+            flatObj[key as keyof object] = value;
+        }
+    }
+
+    return flatObj;
+}
+
+function getEntityColumn(key: string, value: any | entityType, relationsConfig: relationType[]) {
+    for (const relation of relationsConfig) {
+        if (key === relation.property) {
+            return value[relation.column];
+        }
+    }
+
+    return value;
+}
+
+export async function findAllEntities(repository: repositoryType, config?: relationType[]) {
+    let entities = await repository.find({
+        relations: config ? config.map(rel => rel.property) : [],
+    });
+
+    return entities;
+}
+
+export async function findOneEntity(id: number, repository: repositoryType, config?: relationType[]) {
+    let entity = await repository.findOne({
+        where: { id: id },
+        relations: config ? config.map(rel => rel.property) : [],
+    });
+
+    if (entity) {
+        return entity;
+    } else throw new BadRequestException(`${repository.metadata.targetName} with id:${id} not found.`);
 }

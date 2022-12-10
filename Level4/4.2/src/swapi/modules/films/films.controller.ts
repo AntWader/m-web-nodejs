@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { FilmsService } from './films.service';
 import { CreateFilmDto } from '../../dto/create-film.dto';
 import { UpdateFilmDto } from '../../dto/update-film.dto';
 
 @Controller('films')
 export class FilmsController {
-  constructor(private readonly filmsService: FilmsService) {}
+  constructor(private readonly filmsService: FilmsService) { }
 
   @Post()
   create(@Body() createFilmDto: CreateFilmDto) {
@@ -18,17 +18,17 @@ export class FilmsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.filmsService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFilmDto: UpdateFilmDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateFilmDto: UpdateFilmDto) {
     return this.filmsService.update(+id, updateFilmDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.filmsService.remove(+id);
   }
 }

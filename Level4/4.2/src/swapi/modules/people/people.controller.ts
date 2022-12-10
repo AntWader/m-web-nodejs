@@ -2,9 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from 
 import { PeopleService } from './people.service';
 import { CreatePersonDto } from '../../dto/create-person.dto';
 import { UpdatePersonDto } from '../../dto/update-person.dto';
-import { FilterOperator, Paginate, PaginateQuery, paginate, Paginated } from 'nestjs-paginate'
-import { Person } from 'src/swapi/entities/person.entity';
-import { ApiProperty, ApiQuery } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { ApiQuery } from '@nestjs/swagger';
 
 @Controller()
 export class PeopleController {
