@@ -1,9 +1,9 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Request as RequestType, Response as ResponseType, NextFunction } from 'express';
 
 @Injectable()
 export class ImgUploader implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
+  use(req: RequestType, res: ResponseType, next: NextFunction) {
     console.log(`${new Date()} Request...`);
     console.log(req.files)
     next();

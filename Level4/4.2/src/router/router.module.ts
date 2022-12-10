@@ -3,11 +3,16 @@ import { PeopleModule } from '../swapi/modules/people/people.module';
 import { APP_INTERCEPTOR, RouterModule } from '@nestjs/core';
 import { ImagesModule } from 'src/swapi/modules/images/images.module';
 import { TransformInterceptor } from 'src/middleware/transform.interceptor';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
-    PeopleModule, ImagesModule,
+    PeopleModule, ImagesModule, AuthModule,
     RouterModule.register([
+      {
+        path: 'login',
+        module: AuthModule,
+      },
       {
         path: 'people',
         module: PeopleModule,
