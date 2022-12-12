@@ -4,7 +4,9 @@ import { CreatePersonDto } from '../../dto/create-person.dto';
 import { UpdatePersonDto } from '../../dto/update-person.dto';
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { ApiQuery } from '@nestjs/swagger';
+import { Roles } from 'src/auth/roles/roles.decorator';
 
+@Roles('admin')
 @Controller()
 export class PeopleController {
   constructor(private readonly peopleService: PeopleService) { }
@@ -15,6 +17,7 @@ export class PeopleController {
   }
 
   @Get()
+  @Roles('user')
   findAll() {
     return this.peopleService.findAll();
   }
@@ -26,11 +29,13 @@ export class PeopleController {
     type: Number
   })
   @Get()
+  @Roles('user')
   getPage(@Paginate() query: PaginateQuery) {
     return this.peopleService.getPage(query)
   }
 
   @Get(':id')
+  @Roles('user')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.peopleService.findOne(id);
   }

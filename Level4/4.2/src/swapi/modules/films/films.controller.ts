@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from 
 import { FilmsService } from './films.service';
 import { CreateFilmDto } from '../../dto/create-film.dto';
 import { UpdateFilmDto } from '../../dto/update-film.dto';
+import { Roles } from 'src/auth/roles/roles.decorator';
 
-@Controller('films')
+@Roles('admin')
+@Controller()
 export class FilmsController {
   constructor(private readonly filmsService: FilmsService) { }
 
@@ -13,11 +15,13 @@ export class FilmsController {
   }
 
   @Get()
+  @Roles('user')
   findAll() {
     return this.filmsService.findAll();
   }
 
   @Get(':id')
+  @Roles('user')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.filmsService.findOne(+id);
   }

@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-// This should be a real class/interface representing a user entity
-export type User = any;
+// user entity
+export type User = {
+    userId: number,
+    username: string,
+    password: string,
+};
 
 @Injectable()
 export class UsersService {
@@ -10,11 +14,13 @@ export class UsersService {
             userId: 1,
             username: 'admin',
             password: 'admin',
+            roles: ['admin', 'user'],
         },
         {
             userId: 2,
             username: 'user',
             password: 'password',
+            roles: ['admin', 'user'],
         },
     ];
 
