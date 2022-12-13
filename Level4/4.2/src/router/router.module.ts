@@ -5,7 +5,7 @@ import { ImagesModule } from 'src/swapi/modules/images/images.module';
 import { TransformInterceptor } from 'src/middleware/transform.interceptor';
 import { AuthModule } from 'src/auth/auth.module';
 import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
-import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { LoggingInterceptor } from 'src/middleware/logging.interceptor';
 
 @Module({
   imports: [
@@ -32,13 +32,17 @@ import { RolesGuard } from 'src/auth/roles/roles.guard';
       useClass: TransformInterceptor,
     },
     {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+    {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
   ],
 })
 export class ApiRouterModule { }

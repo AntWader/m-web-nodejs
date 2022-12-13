@@ -3,6 +3,7 @@ import { ApiBody } from "@nestjs/swagger";
 import { Request as RequestType } from 'express';
 import { UserLoginDto } from "src/auth_users/users.login.dto";
 import { LocalAuthGuard } from "./local/local.auth.guard";
+import * as util from 'util';
 
 @Controller()
 export class AuthController {
@@ -10,7 +11,8 @@ export class AuthController {
     @ApiBody({ type: UserLoginDto })
     @Post()
     async login(@Request() req: RequestType) {
-        console.log(req.user)
+        process.stdout.write(`auth -> req.user: ${util.inspect(req.user, { showHidden: false, depth: null, colors: true })}`);
+
         return req.user;
     }
 }

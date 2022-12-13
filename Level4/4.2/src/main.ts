@@ -20,16 +20,11 @@ async function bootstrap() {
     session({
       secret: 'my-secret',
       resave: false,
-      saveUninitialized: true,
-      cookie: { maxAge: 3600000 },
+      saveUninitialized: false,
     }),
   );
   app.use(passport.initialize());
   app.use(passport.session());
-
-  // app.useGlobalFilters(new HttpExceptionFilter());
-
-  // app.useGlobalInterceptors(new TransformInterceptor());
 
   await app.listen(3000);
 }

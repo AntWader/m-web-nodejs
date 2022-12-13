@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { PeopleService } from './people.service';
 import { CreatePersonDto } from '../../dto/create-person.dto';
 import { UpdatePersonDto } from '../../dto/update-person.dto';
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { ApiQuery } from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
 
+@UseGuards(RolesGuard)
 @Roles('admin')
 @Controller()
 export class PeopleController {
