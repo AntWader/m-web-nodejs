@@ -6,13 +6,13 @@ import { tap } from 'rxjs/operators';
 export class LoggingInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         process.stdout.write(`${new Date().toUTCString()} :: `);
-        // ADD SOMETHING COOL!
+        // ADD SOMETHING COOL HERE!
 
         const now = Date.now();
         return next
             .handle()
             .pipe(
-                tap(() => console.log(`${Date.now() - now}ms`)),
+                tap(() => console.log(` +${Date.now() - now}ms`)),
             );
     }
 }

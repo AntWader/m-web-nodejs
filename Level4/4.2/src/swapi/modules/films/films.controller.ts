@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { FilmsService } from './films.service';
 import { CreateFilmDto } from '../../dto/create-film.dto';
 import { UpdateFilmDto } from '../../dto/update-film.dto';
 import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
 
+@UseGuards(RolesGuard)
 @Roles('admin')
 @Controller()
 export class FilmsController {

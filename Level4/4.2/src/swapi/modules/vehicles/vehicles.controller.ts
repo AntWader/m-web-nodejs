@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from '../../dto/create-vehicle.dto';
 import { UpdateVehicleDto } from '../../dto/update-vehicle.dto';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
 
-@Controller('vehicles')
+@UseGuards(RolesGuard)
+@Roles('admin')
+@Controller()
 export class VehiclesController {
   constructor(private readonly vehiclesService: VehiclesService) { }
 
@@ -13,11 +17,13 @@ export class VehiclesController {
   }
 
   @Get()
+  @Roles('user')
   findAll() {
     return this.vehiclesService.findAll();
   }
 
   @Get(':id')
+  @Roles('user')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.vehiclesService.findOne(+id);
   }

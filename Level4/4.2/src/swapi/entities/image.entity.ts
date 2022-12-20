@@ -7,6 +7,9 @@ export class Image {
     id: number;
 
     @Column()
+    key: string;
+
+    @Column()
     src: string;
 
     @ManyToMany(() => Person,)

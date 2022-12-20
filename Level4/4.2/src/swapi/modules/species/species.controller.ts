@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { SpeciesService } from './species.service';
 import { CreateSpeciesDto } from '../../dto/create-species.dto';
 import { UpdateSpeciesDto } from '../../dto/update-species.dto';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
 
-@Controller('species')
+@UseGuards(RolesGuard)
+@Roles('admin')
+@Controller()
 export class SpeciesController {
   constructor(private readonly speciesService: SpeciesService) { }
 
@@ -13,11 +17,13 @@ export class SpeciesController {
   }
 
   @Get()
+  @Roles('user')
   findAll() {
     return this.speciesService.findAll();
   }
 
   @Get(':id')
+  @Roles('user')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.speciesService.findOne(id);
   }
