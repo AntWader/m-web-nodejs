@@ -36,3 +36,6 @@ lerna-debug.log*
 
 # temprorary files
 /uploads
+
+# important s3 key
+S3Key.ts
