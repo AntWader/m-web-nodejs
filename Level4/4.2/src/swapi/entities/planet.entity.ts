@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable, JoinColumn } from 'typeorm';
 import { Film } from './film.entity';
 import { Person } from './person.entity';
 import { Species } from './species.entity';
@@ -12,13 +12,13 @@ export class Planet {
     name: string;
 
     @Column()
-    rotation_period: number;
+    rotation_period: string;
 
     @Column()
-    orbital_period: number;
+    orbital_period: string;
 
     @Column()
-    diameter: number;
+    diameter: string;
 
     @Column()
     climate: string;
@@ -30,10 +30,10 @@ export class Planet {
     terrain: string;
 
     @Column()
-    surface_water: number;
+    surface_water: string;
 
     @Column()
-    population: number;
+    population: string;
 
     @OneToMany(() => Species, s => s.homeworld,)
     species: Species[];
@@ -41,7 +41,7 @@ export class Planet {
     @OneToMany(() => Person, p => p.homeworld,)
     residents: Person[];
 
-    @ManyToMany(() => Film,)
+    @ManyToMany(() => Film, f => f.planets)
     @JoinTable()
     films: Film[];
 

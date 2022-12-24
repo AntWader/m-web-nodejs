@@ -16,7 +16,7 @@ export class Film {
     @Column()
     episode_id: number;
 
-    @Column()
+    @Column("longtext")
     opening_crawl: string;
 
     @Column()
@@ -33,19 +33,19 @@ export class Film {
     })
     release_date: Date;
 
-    @ManyToMany(() => Person,)
+    @ManyToMany(() => Person, p => p.films)
     characters: Person[];
 
-    @ManyToMany(() => Planet,)
+    @ManyToMany(() => Planet, p => p.films)
     planets: Planet[];
 
-    @ManyToMany(() => Starship,)
+    @ManyToMany(() => Starship, p => p.films)
     starships: Starship[];
 
-    @ManyToMany(() => Vehicle,)
+    @ManyToMany(() => Vehicle, v => v.films)
     vehicles: Vehicle[];
 
-    @ManyToMany(() => Species,)
+    @ManyToMany(() => Species, p => p.films)
     species: Species[];
 
     @Column("timestamp", {

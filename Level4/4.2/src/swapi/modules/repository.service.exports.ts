@@ -1,5 +1,5 @@
 import { BadRequestException } from "@nestjs/common";
-import { Repository } from "typeorm";
+import { FindManyOptions, ObjectLiteral, Repository } from "typeorm";
 
 
 export type entityType = Record<string, any>;
@@ -17,6 +17,8 @@ export async function createEntity(
     dto: entityType,
     relations?: relationType[],
 ) {
+    //const filteredDto = filterUnknown(dto);
+
     let entityProperties: Partial<entityType>;
     let relationsProperties: Partial<entityType>;
 
@@ -28,10 +30,31 @@ export async function createEntity(
         relationsProperties = {};
     }
 
+    console.log({ ...entityProperties, ...relationsProperties });
+
     let entity = entityRepository.create({ ...entityProperties, ...relationsProperties })
     await entityRepository.save(entity);
 
     return `This action adds a new ${entityRepository.metadata.targetName}.`;
+}
+
+/**
+ * Changes properties values with 'unknown' value to null value.
+ * 
+ * @param dto object with properties to change
+ * @returns object with properties with 'unknown' values changed to null
+ */
+function filterUnknown(dto: entityType) {
+    let filtered = {};
+
+    for (const key in dto) {
+        if (dto.hasOwnProperty(key)) {
+            if (dto[key] === 'unknown') { dto[key] = null; }
+            filtered[key as keyof Object] = dto[key];
+        }
+    }
+
+    return filtered;
 }
 
 /**
@@ -41,13 +64,13 @@ export async function createEntity(
  * @param prop properties list to remove from object
  * @returns object without selected properties
  */
-function filterProperty(dto: Object, prop: string[]) {
+function filterProperty(dto: entityType, prop: string[]) {
 
     const filtered = Object.keys(dto)
         .filter(key => !prop.includes(key))
         .reduce((obj, key) => {
-            //@ts-ignore
-            obj[key] = dto[key];
+
+            obj[key as keyof Object] = dto[key];
             return obj;
         }, {});
 
@@ -120,6 +143,8 @@ export async function updateEntity(
     dto: entityType,
     relations?: relationType[],
 ) {
+    //const filteredDto = filterUnknown(dto);
+
     let entity = await entityRepository.findOne({ where: { id: entityId } });
     let updateProperties: Partial<entityType>;
     let updateRelations: Partial<entityType>;
@@ -197,9 +222,23 @@ function getEntityColumn(key: string, value: any | entityType, relationsConfig: 
 }
 
 export async function findAllEntities(repository: repositoryType, config?: relationType[]) {
-    let entities = await repository.find({
+    // const findOption = {
+    //     relations: config ? config
+    //         .reduce((obj, val) => {
+    //             obj[val.property] = { id: true, url: true };
+
+    //             return obj;
+    //         }, {} as Record<string, Record<string, boolean> | boolean>) : [],
+    // }
+
+    const findOption: FindManyOptions = {
         relations: config ? config.map(rel => rel.property) : [],
-    });
+        relationLoadStrategy: 'query',
+    }
+
+    console.log(findOption)
+
+    let entities = await repository.find(findOption);
 
     return entities;
 }

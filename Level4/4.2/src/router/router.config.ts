@@ -1,0 +1,9 @@
+export const ROUTER_AUTH_PATH = 'login';
+export const ROUTER_FILMS_PATH = 'films';
+export const ROUTER_PEOPLE_PATH = 'people';
+export const ROUTER_GENDERS_PATH = 'genders';
+export const ROUTER_PLANETS_PATH = 'planets';
+export const ROUTER_SPECIES_PATH = 'species';
+export const ROUTER_STARSHIPS_PATH = 'starships';
+export const ROUTER_VEHICLES_PATH = 'vehicles';
+export const ROUTER_IMAGES_PATH = 'img/people';

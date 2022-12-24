@@ -19,11 +19,11 @@ export class Person {
     @Column()
     name: string;
 
-    @Column("int")
-    height: number;
+    @Column()
+    height: string;
 
-    @Column("int")
-    mass: number;
+    @Column()
+    mass: string;
 
     @Column()
     hair_color: string;
@@ -41,24 +41,21 @@ export class Person {
     @JoinColumn()
     gender: Gender;
 
-    @ManyToOne(() => Planet, g => g.residents,)
+    @ManyToOne(() => Planet, p => p.residents,)
     @JoinColumn()
     homeworld: Planet;
 
-    @ManyToMany(() => Film,)
+    @ManyToMany(() => Film, f => f.characters)
     @JoinTable()
     films: Film[];
 
-    @ManyToMany(() => Species,)
-    @JoinTable()
+    @ManyToMany(() => Species, s => s.people)
     species: Species[];
 
-    @ManyToMany(() => Vehicle,)
-    @JoinTable()
+    @ManyToMany(() => Vehicle, v => v.pilots)
     vehicles: Vehicle[];
 
-    @ManyToMany(() => Starship,)
-    @JoinTable()
+    @ManyToMany(() => Starship, s => s.pilots)
     starships: Starship[];
 
     @Column("timestamp", {

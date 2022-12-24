@@ -12,6 +12,6 @@ export class Image {
     @Column()
     src: string;
 
-    @ManyToMany(() => Person,)
+    @ManyToMany(() => Person, p => p.images)
     people: Person[];
 }

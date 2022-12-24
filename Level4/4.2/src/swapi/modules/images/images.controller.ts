@@ -71,12 +71,20 @@ export class ImagesController {
   @UseInterceptors(FileInterceptor('img', multerConfig))
   @ApiConsumes('multipart/form-data') // swagger
   @ApiBody(apiConfig) // swagger
-  uploadAndLinkImg(
+  async uploadAndLinkImg(
     @UploadedFile(parseImgPipe) file: Express.Multer.File,
-    @Param('personId', ParseIntPipe) personId: number) {
+    @Req() req: RequestType,
+    @Param('personId', ParseIntPipe) personId: number
+  ) {
     console.log(file);
 
-    return this.imagesService.createAndLink(personId, { src: file.path });
+    const s3res = await this.s3Service.upload(file, { uniqKey: true });
+    console.log(s3res);
+
+    const s3URL = `${req.protocol}://${req.get('Host')}/${s3ControllerPath}${s3res.Key}`;
+    console.log(s3URL);
+
+    return this.imagesService.createAndLink(personId, { key: s3res.Key, src: s3URL });
   }
 
   @Get()

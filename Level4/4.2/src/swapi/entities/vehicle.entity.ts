@@ -17,22 +17,22 @@ export class Vehicle {
     manufacturer: string;
 
     @Column()
-    cost_in_credits: number;
+    cost_in_credits: string;
 
     @Column()
-    length: number;
+    length: string;
 
     @Column()
-    max_atmosphering_speed: number;
+    max_atmosphering_speed: string;
 
     @Column()
     crew: string;
 
     @Column()
-    passengers: number;
+    passengers: string;
 
     @Column()
-    cargo_capacity: number;
+    cargo_capacity: string;
 
     @Column()
     consumables: string;
@@ -40,10 +40,11 @@ export class Vehicle {
     @Column()
     vehicle_class: string;
 
-    @ManyToMany(() => Person,)
+    @ManyToMany(() => Person, p => p.vehicles)
+    @JoinTable()
     pilots: Person[];
 
-    @ManyToMany(() => Film,)
+    @ManyToMany(() => Film, f => f.vehicles)
     @JoinTable()
     films: Film[];
 

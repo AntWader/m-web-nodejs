@@ -17,39 +17,40 @@ export class Starship {
     manufacturer: string;
 
     @Column()
-    cost_in_credits: number;
+    cost_in_credits: string;
 
     @Column()
-    length: number;
+    length: string;
 
     @Column()
-    max_atmosphering_speed: number;
+    max_atmosphering_speed: string;
 
     @Column()
     crew: string;
 
     @Column()
-    passengers: number;
+    passengers: string;
 
     @Column()
-    cargo_capacity: number;
+    cargo_capacity: string;
 
     @Column()
     consumables: string;
 
-    @Column("decimal")
-    hyperdrive_rating: number;
+    @Column()
+    hyperdrive_rating: string;
 
     @Column()
-    MGLT: number;
+    MGLT: string;
 
     @Column()
     starship_class: string;
 
-    @ManyToMany(() => Person,)
+    @ManyToMany(() => Person, p => p.starships)
+    @JoinTable()
     pilots: Person[];
 
-    @ManyToMany(() => Film,)
+    @ManyToMany(() => Film, f => f.starships)
     @JoinTable()
     films: Film[];
 

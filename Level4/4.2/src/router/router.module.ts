@@ -12,47 +12,50 @@ import { StarshipsModule } from 'src/swapi/modules/starships/starships.module';
 import { VehiclesModule } from 'src/swapi/modules/vehicles/vehicles.module';
 import { FilmsModule } from 'src/swapi/modules/films/films.module';
 import { GendersModule } from 'src/swapi/modules/genders/genders.module';
+import { DatabaseCreateModule } from 'src/database.create/database.create.module';
+import { ROUTER_AUTH_PATH, ROUTER_FILMS_PATH, ROUTER_GENDERS_PATH, ROUTER_IMAGES_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from './router.config';
 
 @Module({
   imports: [
     AuthModule,
+    DatabaseCreateModule,
     FilmsModule, PeopleModule, GendersModule, PlanetsModule, SpeciesModule, StarshipsModule, VehiclesModule, ImagesModule,
     RouterModule.register([
       {
-        path: 'login',
+        path: ROUTER_AUTH_PATH,
         module: AuthModule,
       },
       {
-        path: 'films',
+        path: ROUTER_FILMS_PATH,
         module: FilmsModule,
       },
       {
-        path: 'people',
+        path: ROUTER_PEOPLE_PATH,
         module: PeopleModule,
         children: []
       },
       {
-        path: 'genders',
+        path: ROUTER_GENDERS_PATH,
         module: GendersModule,
       },
       {
-        path: 'planets',
+        path: ROUTER_PLANETS_PATH,
         module: PlanetsModule,
       },
       {
-        path: 'species',
+        path: ROUTER_SPECIES_PATH,
         module: SpeciesModule,
       },
       {
-        path: 'starships',
+        path: ROUTER_STARSHIPS_PATH,
         module: StarshipsModule,
       },
       {
-        path: 'vehicles',
+        path: ROUTER_VEHICLES_PATH,
         module: VehiclesModule,
       },
       {
-        path: 'img/people',
+        path: ROUTER_IMAGES_PATH,
         module: ImagesModule,
       },
     ]),

@@ -18,7 +18,7 @@ export class Species {
     designation: string;
 
     @Column()
-    average_height: number;
+    average_height: string;
 
     @Column()
     skin_colors: string;
@@ -30,19 +30,20 @@ export class Species {
     eye_colors: string;
 
     @Column()
-    average_lifespan: number;
+    average_lifespan: string;
 
-    @ManyToOne(() => Planet,)
+    @ManyToOne(() => Planet, p => p.species,)
     @JoinColumn()
     homeworld: Planet;
 
     @Column()
     language: string;
 
-    @ManyToMany(() => Person,)
+    @ManyToMany(() => Person, p => p.species)
+    @JoinTable()
     people: Person[];
 
-    @ManyToMany(() => Film,)
+    @ManyToMany(() => Film, f => f.species)
     @JoinTable()
     films: Film[];
 
