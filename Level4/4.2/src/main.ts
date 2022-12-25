@@ -7,6 +7,7 @@ import * as passport from 'passport';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // use swagger
   const config = new DocumentBuilder()
     .setTitle('People example')
     .setDescription('The people API description')
@@ -16,6 +17,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  // use sessions
   app.use(
     session({
       secret: 'my-secret',
@@ -26,6 +28,7 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // set port
   await app.listen(3000);
 }
 bootstrap();

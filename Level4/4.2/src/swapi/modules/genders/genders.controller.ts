@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { GendersService } from './genders.service';
 import { CreateGenderDto } from '../../dto/create-gender.dto';
 import { UpdateGenderDto } from '../../dto/update-gender.dto';
@@ -9,7 +9,7 @@ import { Roles } from 'src/auth/roles/roles.decorator';
 @Roles('admin')
 @Controller()
 export class GendersController {
-  constructor(private readonly gendersService: GendersService) {}
+  constructor(private readonly gendersService: GendersService) { }
 
   @Post()
   create(@Body() createGenderDto: CreateGenderDto) {
@@ -24,17 +24,17 @@ export class GendersController {
 
   @Get(':id')
   @Roles('user')
-  findOne(@Param('id') id: string) {
-    return this.gendersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.gendersService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGenderDto: UpdateGenderDto) {
-    return this.gendersService.update(+id, updateGenderDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateGenderDto: UpdateGenderDto) {
+    return this.gendersService.update(id, updateGenderDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.gendersService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.gendersService.remove(id);
   }
 }

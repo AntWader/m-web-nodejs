@@ -25,16 +25,16 @@ export class FilmsController {
   @Get(':id')
   @Roles('user')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.filmsService.findOne(+id);
+    return this.filmsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() updateFilmDto: UpdateFilmDto) {
-    return this.filmsService.update(+id, updateFilmDto);
+    return this.filmsService.update(id, updateFilmDto);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.filmsService.remove(+id);
+    return this.filmsService.remove(id);
   }
 }

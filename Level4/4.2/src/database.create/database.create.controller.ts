@@ -1,6 +1,8 @@
-import { Controller, Get, Req } from "@nestjs/common";
+import { Controller, Get, Req, UseGuards } from "@nestjs/common";
 import { Request as RequestType } from "express";
-import { ROUTER_FILMS_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from "src/router/router.config";
+import { Roles } from "src/auth/roles/roles.decorator";
+import { RolesGuard } from "src/auth/roles/roles.guard";
+import { ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from "src/router/router.config";
 import { CreateFilmDto } from "src/swapi/dto/create-film.dto";
 import { CreatePersonDto } from "src/swapi/dto/create-person.dto";
 import { CreatePlanetDto } from "src/swapi/dto/create-planet.dto";
@@ -13,9 +15,11 @@ import { PlanetsService } from "src/swapi/modules/planets/planets.service";
 import { SpeciesService } from "src/swapi/modules/species/species.service";
 import { StarshipsService } from "src/swapi/modules/starships/starships.service";
 import { VehiclesService } from "src/swapi/modules/vehicles/vehicles.service";
-import { DatabaseCreateService } from "./database.create.service";
+import { DatabaseCreateService, SWAPI_ENTITY_PATH } from "./database.create.service";
 
-@Controller('create')
+@UseGuards(RolesGuard)
+@Roles('admin')
+@Controller()
 export class DatabaseCreateController {
     constructor(
         private readonly databaseCreateService: DatabaseCreateService,
@@ -29,7 +33,10 @@ export class DatabaseCreateController {
 
     @Get()
     async getFile(@Req() req: RequestType) {
-        // FIRST create
+        // generate console massage about request
+        process.stdout.write(` -> attempt to read entities data from ${SWAPI_ENTITY_PATH} (in project root)`);
+
+        // FIRST create entities
         const films: CreateFilmDto[] = await this.databaseCreateService.readEntityArray('films') as CreateFilmDto[];
         for (const ent of films) {
             await this.filmsService.create(ent);
@@ -66,7 +73,7 @@ export class DatabaseCreateController {
             console.log(`successfully created vehicle: name - ${ent.name}`)
         }
 
-        // SECOND update
+        // SECOND update url values
         const filmsCreated = await this.filmsService.findAll();
         for (const ent of filmsCreated) {
             // const id = filmsCreated.find(element => element.title == ent.title)?.id;

@@ -11,8 +11,6 @@ export class AuthController {
     @ApiBody({ type: UserLoginDto })
     @Post()
     async login(@Request() req: RequestType) {
-        process.stdout.write(`auth -> req.user: ${util.inspect(req.user, { showHidden: false, depth: null, colors: true })}`);
-
         return req.user;
     }
 }

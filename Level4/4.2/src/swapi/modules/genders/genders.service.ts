@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Gender } from 'src/swapi/entities/gender.entity';
+import { Repository } from 'typeorm';
 import { CreateGenderDto } from '../../dto/create-gender.dto';
 import { UpdateGenderDto } from '../../dto/update-gender.dto';
+import { createEntity, findAllEntities, findOneEntity, removeEntity, updateEntity } from '../repository.service.exports';
 
 @Injectable()
 export class GendersService {
-  create(createGenderDto: CreateGenderDto) {
-    return 'This action adds a new gender';
+  constructor(
+    @InjectRepository(Gender) private genderRepository: Repository<Gender>,
+  ) { }
+
+  async create(createGenderDto: CreateGenderDto) {
+    return await createEntity(this.genderRepository, createGenderDto);
   }
 
-  findAll() {
-    return `This action returns all genders`;
+  async findAll() {
+    return await findAllEntities(this.genderRepository);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} gender`;
+  async findOne(id: number) {
+    return await findOneEntity(id, this.genderRepository);
   }
 
-  update(id: number, updateGenderDto: UpdateGenderDto) {
-    return `This action updates a #${id} gender`;
+  async update(id: number, updateGenderDto: UpdateGenderDto) {
+    return await updateEntity(id, this.genderRepository, updateGenderDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} gender`;
+  async remove(id: number) {
+    return await removeEntity(id, this.genderRepository);
   }
 }

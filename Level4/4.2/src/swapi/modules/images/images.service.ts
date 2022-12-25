@@ -31,7 +31,7 @@ export class ImagesService {
   }
 
   async findOne(id: number) {
-    return await findOneEntity(id, this.personRepository);
+    return await findOneEntity(id, this.imgRepository);
   }
 
   async update(id: number, updateImageDto: UpdateImageDto) {

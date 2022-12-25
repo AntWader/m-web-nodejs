@@ -1,4 +1,5 @@
 export const ROUTER_AUTH_PATH = 'login';
+export const ROUTER_CREATE_DB_PATH = 'create';
 export const ROUTER_FILMS_PATH = 'films';
 export const ROUTER_PEOPLE_PATH = 'people';
 export const ROUTER_GENDERS_PATH = 'genders';
