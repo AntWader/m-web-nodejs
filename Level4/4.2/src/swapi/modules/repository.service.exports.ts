@@ -1,5 +1,5 @@
 import { BadRequestException } from "@nestjs/common";
-import { FindManyOptions, ObjectLiteral, Repository } from "typeorm";
+import { FindManyOptions, FindOneOptions, ObjectLiteral, Repository } from "typeorm";
 
 
 export type entityType = Record<string, any>;
@@ -194,7 +194,7 @@ export async function removeEntity(entityId: number, entityRepository: repositor
  * @returns entity object with entity values replaced by entity first column (except id) value.
  */
 export function flatten(obj: object, relationsConfig: relationType[]) {
-    let flatObj: Record<string, any> = {};
+    let flatObj: entityType = {};
 
     for (const [key, value] of Object.entries(obj)) {
         if (value) { // in case: value = null
@@ -221,35 +221,61 @@ function getEntityColumn(key: string, value: any | entityType, relationsConfig: 
     return value;
 }
 
-export async function findAllEntities(repository: repositoryType, config?: relationType[]) {
-    // const findOption = {
-    //     relations: config ? config
-    //         .reduce((obj, val) => {
-    //             obj[val.property] = { id: true, url: true };
+export async function findAll(repository: repositoryType, config?: relationType[]) {
+    const findAllOption: FindManyOptions = createFindAllOption(config);
 
-    //             return obj;
-    //         }, {} as Record<string, Record<string, boolean> | boolean>) : [],
-    // }
-
-    const findOption: FindManyOptions = {
-        relations: config ? config.map(rel => rel.property) : [],
-        relationLoadStrategy: 'query',
-    }
-
-    console.log(findOption)
-
-    let entities = await repository.find(findOption);
+    let entities = await repository.find(findAllOption);
 
     return entities;
 }
 
-export async function findOneEntity(id: number, repository: repositoryType, config?: relationType[]) {
-    let entity = await repository.findOne({
-        where: { id: id },
+/**
+ * Creates options config for repository.find() method with respect to relations defined in config.
+ * 
+ * @param config config array of relation config info, such as [property]: relation column name, 
+ * and [column]: main info column name.
+ * @returns config for finding all entities with all specified in config relations.
+ */
+function createFindAllOption(config?: relationType[]) {
+    const findOption: FindManyOptions = {
         relations: config ? config.map(rel => rel.property) : [],
-    });
+        select: config ? config
+            .reduce((obj, val) => {
+                obj[val.property] = { id: true, [val.column]: true };
+                return obj;
+            }, {} as Record<string, Record<string, boolean> | boolean>) : {},
+        relationLoadStrategy: 'query',
+    }
+
+    return findOption;
+}
+
+export async function findOne(id: number, repository: repositoryType, config?: relationType[]) {
+    const findOneOption: FindOneOptions = { ...createFindAllOption(config), where: { id: id } }
+
+    let entity = await repository.findOne(findOneOption);
 
     if (entity) {
         return entity;
     } else throw new BadRequestException(`${repository.metadata.targetName} with id:${id} not found.`);
+}
+
+export async function findAllEntities(repository: repositoryType, config?: relationType[]) {
+    const result = await findAll(repository, config);
+
+    if (config) {
+        return result.map(entity => flatten(entity, config));
+    }
+
+    return result;
+}
+
+export async function findOneEntity(id: number, repository: repositoryType, config?: relationType[]) {
+    const result = await findOne(id, repository, config);
+
+    if (config) {
+        return flatten(result, config);
+    }
+
+    return result;
 }
