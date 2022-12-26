@@ -1,5 +1,5 @@
 import { S3 } from "aws-sdk";
-import { S3KEY, S3REGION, S3SECRETKEY } from "S3Key";
+import { BUCKET_NAME, S3KEY, S3REGION, S3SECRETKEY, USER_NAME } from "S3Key";
 
 export const s3ControllerPath = 's3/';
 
@@ -9,5 +9,5 @@ export const S3Config: S3.Types.ClientConfiguration = {
     secretAccessKey: S3SECRETKEY,
 }
 
-export const bucketName = "m-node-js-4";
-export const userName = "m-node-js-4-user";
+export const bucketName = BUCKET_NAME;
+export const userName = USER_NAME;

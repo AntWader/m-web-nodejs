@@ -35,7 +35,7 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 # temprorary files
-/uploads
+#/uploads
 
 # important s3 key
 S3Key.ts
