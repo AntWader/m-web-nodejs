@@ -38,4 +38,4 @@ lerna-debug.log*
 #/uploads
 
 # important s3 key
-S3Key.ts
+#S3Key.ts
