@@ -18,6 +18,10 @@ import { VehiclesService } from "src/swapi/modules/vehicles/vehicles.service";
 import { DatabaseCreateController } from "./database.create.controller";
 import { DatabaseCreateService } from "./database.create.service";
 
+/**
+ * This module provides creating db data by requesting with GET method on it's controller root.
+ * Data must be stored in .json files with each swapi entity data stored within directory SWAPI_ENTITY_PATH.
+ */
 @Module({
     imports: [DatabaseModule, TypeOrmModule.forFeature([Person, Image, Gender, Planet, Film, Species, Vehicle, Starship])],
     controllers: [DatabaseCreateController],
