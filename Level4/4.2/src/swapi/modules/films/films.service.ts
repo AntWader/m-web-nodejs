@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Film } from 'src/swapi/entities/film.entity';
-import { Person } from 'src/swapi/entities/person.entity';
-import { Planet } from 'src/swapi/entities/planet.entity';
-import { Species } from 'src/swapi/entities/species.entity';
-import { Starship } from 'src/swapi/entities/starship.entity';
-import { Vehicle } from 'src/swapi/entities/vehicle.entity';
+import { Film } from '../../entities/film.entity';
+import { Person } from '../../entities/person.entity';
+import { Planet } from '../../entities/planet.entity';
+import { Species } from '../../entities/species.entity';
+import { Starship } from '../../entities/starship.entity';
+import { Vehicle } from '../../entities/vehicle.entity';
 import { Repository } from 'typeorm';
 import { CreateFilmDto } from '../../dto/create-film.dto';
 import { UpdateFilmDto } from '../../dto/update-film.dto';
 import { createEntity, findAllEntities, findOneEntity, relationType, removeEntity, updateEntity } from '../repository.service.exports';
+import { paginate, PaginateQuery } from 'nestjs-paginate';
+import { filmPaginateConfig } from './films.paginate.config';
 
 let filmRelationsConfig: relationType[];
 
@@ -38,6 +40,10 @@ export class FilmsService {
 
   async findAll() {
     return await findAllEntities(this.filmRepository, filmRelationsConfig);
+  }
+
+  getPage(query: PaginateQuery) {
+    return paginate(query, this.filmRepository, filmPaginateConfig);
   }
 
   async findOne(id: number) {

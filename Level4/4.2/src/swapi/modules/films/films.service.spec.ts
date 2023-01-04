@@ -12,7 +12,9 @@ describe('FilmsService', () => {
     service = module.get<FilmsService>(FilmsService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('findAll', () => {
+    it('should be defined', () => {
+      expect(service).toBeDefined();
+    });
   });
 });

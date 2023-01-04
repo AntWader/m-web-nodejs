@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGua
 import { FilmsService } from './films.service';
 import { CreateFilmDto } from '../../dto/create-film.dto';
 import { UpdateFilmDto } from '../../dto/update-film.dto';
-import { Roles } from 'src/auth/roles/roles.decorator';
-import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from '../../../auth/roles/roles.decorator';
+import { RolesGuard } from '../../../auth/roles/roles.guard';
+import { ApiQuery } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @UseGuards(RolesGuard)
 @Roles('admin')
@@ -20,6 +22,18 @@ export class FilmsController {
   @Roles('user')
   findAll() {
     return this.filmsService.findAll();
+  }
+
+  @ApiQuery({
+    name: "page",
+    description: "Page number",
+    required: false,
+    type: Number
+  })
+  @Get()
+  @Roles('user')
+  getPage(@Paginate() query: PaginateQuery) {
+    return this.filmsService.getPage(query)
   }
 
   @Get(':id')

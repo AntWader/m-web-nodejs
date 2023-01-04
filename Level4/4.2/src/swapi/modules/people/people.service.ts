@@ -13,6 +13,7 @@ import { Planet } from 'src/swapi/entities/planet.entity';
 import { Species } from 'src/swapi/entities/species.entity';
 import { Vehicle } from 'src/swapi/entities/vehicle.entity';
 import { Starship } from 'src/swapi/entities/starship.entity';
+import { personPaginateConfig } from './person.paginate.config';
 
 let peopleRelationsConfig: relationType[];
 
@@ -48,13 +49,7 @@ export class PeopleService {
   }
 
   getPage(query: PaginateQuery) {
-    return paginate(query, this.personRepository, {
-      sortableColumns: ['id', 'name',],
-      nullSort: 'last',
-      searchableColumns: ['name',],
-      defaultSortBy: [['id', 'DESC']],
-      defaultLimit: 10,
-    })
+    return paginate(query, this.personRepository, personPaginateConfig);
   }
 
   async findOne(id: number) {
