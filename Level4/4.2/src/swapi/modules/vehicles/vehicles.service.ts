@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Film } from 'src/swapi/entities/film.entity';
-import { Person } from 'src/swapi/entities/person.entity';
-import { Vehicle } from 'src/swapi/entities/vehicle.entity';
+import { Film } from '../../../swapi/entities/film.entity';
+import { Person } from '../../../swapi/entities/person.entity';
+import { Vehicle } from '../../../swapi/entities/vehicle.entity';
 import { Repository } from 'typeorm';
 import { CreateVehicleDto } from '../../dto/create-vehicle.dto';
 import { UpdateVehicleDto } from '../../dto/update-vehicle.dto';
 import { createEntity, findAllEntities, findOneEntity, relationType, removeEntity, updateEntity } from '../repository.service.exports';
+import { PaginateQuery, paginate } from 'nestjs-paginate';
+import { vehiclePaginateConfig } from './vehicles.paginate.config';
 
 let vehiclesRelationsConfig: relationType[];
 
@@ -29,6 +31,10 @@ export class VehiclesService {
 
   async findAll() {
     return await findAllEntities(this.vehicleRepository, vehiclesRelationsConfig);
+  }
+
+  getPage(query: PaginateQuery) {
+    return paginate(query, this.vehicleRepository, vehiclePaginateConfig);
   }
 
   async findOne(id: number) {

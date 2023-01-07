@@ -56,10 +56,10 @@ export const notOk = { ok: false };
 
 export class MockService {
     entitiesList: entityType[];
-    generatedNumber: number;
-    constructor(generatedNumber: number, createEntityTemplatesCallback: (value: number, index: number) => entityType) {
-        this.generatedNumber = generatedNumber;
-        this.entitiesList = [...Array(this.generatedNumber).keys()].map(createEntityTemplatesCallback);
+    createEntityNumber: number;
+    constructor(createEntityNumber: number, createEntityTemplatesCallback: (value: number, index: number) => entityType) {
+        this.createEntityNumber = createEntityNumber;
+        this.entitiesList = [...Array(this.createEntityNumber).keys()].map(createEntityTemplatesCallback);
     }
 
     create = jest.fn(async (dto: testDtoType) => {

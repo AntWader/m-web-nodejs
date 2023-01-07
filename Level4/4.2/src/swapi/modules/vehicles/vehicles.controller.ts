@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGua
 import { VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from '../../dto/create-vehicle.dto';
 import { UpdateVehicleDto } from '../../dto/update-vehicle.dto';
-import { RolesGuard } from 'src/auth/roles/roles.guard';
-import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from '../../../auth/roles/roles.guard';
+import { Roles } from '../../../auth/roles/roles.decorator';
+import { ApiQuery } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @UseGuards(RolesGuard)
 @Roles('admin')
@@ -20,6 +22,18 @@ export class VehiclesController {
   @Roles('user')
   findAll() {
     return this.vehiclesService.findAll();
+  }
+
+  @ApiQuery({
+    name: "page",
+    description: "Page number",
+    required: false,
+    type: Number
+  })
+  @Get()
+  @Roles('user')
+  getPage(@Paginate() query: PaginateQuery) {
+    return this.vehiclesService.getPage(query)
   }
 
   @Get(':id')

@@ -5,11 +5,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiBody, ApiBodyOptions, ApiConsumes } from '@nestjs/swagger';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
-import { Roles } from 'src/auth/roles/roles.decorator';
-import { RolesGuard } from 'src/auth/roles/roles.guard';
-import { S3Service } from 'src/s3/s3.service';
+import { Roles } from '../../../auth/roles/roles.decorator';
+import { RolesGuard } from '../../../auth/roles/roles.guard';
+import { S3Service } from '../../../s3/s3.service';
 import { Request as RequestType, Response as ResponseType } from 'express';
-import { s3ControllerPath } from 'src/s3/s3.config';
+import { s3ControllerPath } from '../../../s3/s3.config';
 
 const multerConfig: MulterOptions = {};
 // const multerConfig: MulterOptions = {

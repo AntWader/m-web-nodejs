@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Film } from 'src/swapi/entities/film.entity';
-import { Person } from 'src/swapi/entities/person.entity';
-import { Planet } from 'src/swapi/entities/planet.entity';
-import { Species } from 'src/swapi/entities/species.entity';
+import { Film } from '../../../swapi/entities/film.entity';
+import { Person } from '../../../swapi/entities/person.entity';
+import { Planet } from '../../../swapi/entities/planet.entity';
+import { Species } from '../../../swapi/entities/species.entity';
 import { Repository } from 'typeorm';
 import { CreatePlanetDto } from '../../dto/create-planet.dto';
 import { UpdatePlanetDto } from '../../dto/update-planet.dto';
 import { createEntity, findAllEntities, findOneEntity, relationType, removeEntity, updateEntity } from '../repository.service.exports';
+import { paginate, PaginateQuery } from 'nestjs-paginate';
+import { planetPaginateConfig } from './planets.paginate.config';
 
 let planetRelationsConfig: relationType[];
 
@@ -32,6 +34,10 @@ export class PlanetsService {
 
   async findAll() {
     return await findAllEntities(this.planetRepository, planetRelationsConfig);
+  }
+
+  getPage(query: PaginateQuery) {
+    return paginate(query, this.planetRepository, planetPaginateConfig);
   }
 
   async findOne(id: number) {

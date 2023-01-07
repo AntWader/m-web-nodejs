@@ -6,13 +6,13 @@ import { UpdatePersonDto } from '../../dto/update-person.dto';
 import { Person } from '../../entities/person.entity';
 import { Gender } from '../../entities/gender.entity';
 import { Image } from '../../entities/image.entity';
-import { Film } from 'src/swapi/entities/film.entity';
+import { Film } from '../../../swapi/entities/film.entity';
 import { createEntity, findAllEntities, findOneEntity, flatten, relationType, removeEntity, updateEntity } from '../repository.service.exports';
 import { PaginateQuery, paginate } from 'nestjs-paginate';
-import { Planet } from 'src/swapi/entities/planet.entity';
-import { Species } from 'src/swapi/entities/species.entity';
-import { Vehicle } from 'src/swapi/entities/vehicle.entity';
-import { Starship } from 'src/swapi/entities/starship.entity';
+import { Planet } from '../../../swapi/entities/planet.entity';
+import { Species } from '../../../swapi/entities/species.entity';
+import { Vehicle } from '../../../swapi/entities/vehicle.entity';
+import { Starship } from '../../../swapi/entities/starship.entity';
 import { personPaginateConfig } from './person.paginate.config';
 
 let peopleRelationsConfig: relationType[];

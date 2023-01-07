@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGua
 import { PlanetsService } from './planets.service';
 import { CreatePlanetDto } from '../../dto/create-planet.dto';
 import { UpdatePlanetDto } from '../../dto/update-planet.dto';
-import { RolesGuard } from 'src/auth/roles/roles.guard';
-import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from '../../../auth/roles/roles.guard';
+import { Roles } from '../../../auth/roles/roles.decorator';
+import { ApiQuery } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @UseGuards(RolesGuard)
 @Roles('admin')
@@ -20,6 +22,18 @@ export class PlanetsController {
   @Roles('user')
   findAll() {
     return this.planetsService.findAll();
+  }
+
+  @ApiQuery({
+    name: "page",
+    description: "Page number",
+    required: false,
+    type: Number
+  })
+  @Get()
+  @Roles('user')
+  getPage(@Paginate() query: PaginateQuery) {
+    return this.planetsService.getPage(query)
   }
 
   @Get(':id')

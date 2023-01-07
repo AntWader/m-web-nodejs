@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Film } from '../../entities/film.entity';
-import { Person } from '../../entities/person.entity';
-import { Planet } from '../../entities/planet.entity';
-import { Species } from '../../entities/species.entity';
-import { Starship } from '../../entities/starship.entity';
-import { Vehicle } from '../../entities/vehicle.entity';
+import { Film } from '../../../swapi/entities/film.entity';
+import { Person } from '../../../swapi/entities/person.entity';
+import { Planet } from '../../../swapi/entities/planet.entity';
+import { Species } from '../../../swapi/entities/species.entity';
+import { Starship } from '../../../swapi/entities/starship.entity';
+import { Vehicle } from '../../../swapi/entities/vehicle.entity';
 import { Repository } from 'typeorm';
 import { CreateFilmDto } from '../../dto/create-film.dto';
 import { UpdateFilmDto } from '../../dto/update-film.dto';

@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGua
 import { StarshipsService } from './starships.service';
 import { CreateStarshipDto } from '../../dto/create-starship.dto';
 import { UpdateStarshipDto } from '../../dto/update-starship.dto';
-import { RolesGuard } from 'src/auth/roles/roles.guard';
-import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from '../../../auth/roles/roles.guard';
+import { Roles } from '../../../auth/roles/roles.decorator';
+import { ApiQuery } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @UseGuards(RolesGuard)
 @Roles('admin')
@@ -20,6 +22,18 @@ export class StarshipsController {
   @Roles('user')
   findAll() {
     return this.starshipsService.findAll();
+  }
+
+  @ApiQuery({
+    name: "page",
+    description: "Page number",
+    required: false,
+    type: Number
+  })
+  @Get()
+  @Roles('user')
+  getPage(@Paginate() query: PaginateQuery) {
+    return this.starshipsService.getPage(query)
   }
 
   @Get(':id')

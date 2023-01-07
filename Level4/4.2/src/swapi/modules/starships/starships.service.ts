@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Film } from 'src/swapi/entities/film.entity';
-import { Person } from 'src/swapi/entities/person.entity';
-import { Starship } from 'src/swapi/entities/starship.entity';
+import { Film } from '../../../swapi/entities/film.entity';
+import { Person } from '../../../swapi/entities/person.entity';
+import { Starship } from '../../../swapi/entities/starship.entity';
 import { Repository } from 'typeorm';
 import { CreateStarshipDto } from '../../dto/create-starship.dto';
 import { UpdateStarshipDto } from '../../dto/update-starship.dto';
 import { createEntity, findAllEntities, findOneEntity, relationType, removeEntity, updateEntity } from '../repository.service.exports';
+import { starshipPaginateConfig } from './starships.paginate.config';
+import { PaginateQuery, paginate } from 'nestjs-paginate';
 
 let starshipRelationsConfig: relationType[];
 
@@ -29,6 +31,10 @@ export class StarshipsService {
 
   async findAll() {
     return await findAllEntities(this.starshipRepository, starshipRelationsConfig);
+  }
+
+  getPage(query: PaginateQuery) {
+    return paginate(query, this.starshipRepository, starshipPaginateConfig);
   }
 
   async findOne(id: number) {

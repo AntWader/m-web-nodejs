@@ -30,12 +30,14 @@ export async function createEntity(
         relationsProperties = {};
     }
 
-    console.log({ ...entityProperties, ...relationsProperties });
+    //console.log({ ...entityProperties, ...relationsProperties });
 
     let entity = entityRepository.create({ ...entityProperties, ...relationsProperties })
-    await entityRepository.save(entity);
+    const result = await entityRepository.save(entity);
 
-    return `This action adds a new ${entityRepository.metadata.targetName}.`;
+    return result;
+
+    //return `This action adds a new ${entityRepository.metadata.targetName}.`;
 }
 
 /**
@@ -158,9 +160,12 @@ export async function updateEntity(
     }
 
     if (entity) {
-        await entityRepository.save(replaceProperties(entity, { ...updateProperties, ...updateRelations }));
+        const result = await entityRepository.save(replaceProperties(entity, { ...updateProperties, ...updateRelations }));
 
-        return `This action updates ${entityRepository.metadata.targetName} with id:${entityId} and it\'s relations:${updateRelations}.`;
+        //console.log(result)
+        return result;
+
+        //return `This action updates ${entityRepository.metadata.targetName} with id:${entityId} and it\'s relations:${updateRelations}.`;
     } else throw new BadRequestException(`${entityRepository.metadata.targetName} with id:${entityId} not found.`);
 }
 
@@ -180,9 +185,12 @@ export async function removeEntity(entityId: number, entityRepository: repositor
     let entity = await entityRepository.findOne({ where: { id: entityId } });
 
     if (entity) {
-        await entityRepository.remove(entity)
+        const result = await entityRepository.remove(entity)
 
-        return `This action removes entity ${entityRepository.metadata.targetName} with id:${entityId}.`;
+        //console.log(result)
+        return result;
+
+        //return `This action removes entity ${entityRepository.metadata.targetName} with id:${entityId}.`;
     } else throw new BadRequestException(`${entityRepository.metadata.targetName} with id:${entityId} not found.`);
 }
 

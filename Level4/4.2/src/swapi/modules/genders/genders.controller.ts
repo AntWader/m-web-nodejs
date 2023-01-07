@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntP
 import { GendersService } from './genders.service';
 import { CreateGenderDto } from '../../dto/create-gender.dto';
 import { UpdateGenderDto } from '../../dto/update-gender.dto';
-import { RolesGuard } from 'src/auth/roles/roles.guard';
-import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from '../../../auth/roles/roles.guard';
+import { Roles } from '../../../auth/roles/roles.decorator';
+import { ApiQuery } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @UseGuards(RolesGuard)
 @Roles('admin')
@@ -20,6 +22,18 @@ export class GendersController {
   @Roles('user')
   findAll() {
     return this.gendersService.findAll();
+  }
+
+  @ApiQuery({
+    name: "page",
+    description: "Page number",
+    required: false,
+    type: Number
+  })
+  @Get()
+  @Roles('user')
+  getPage(@Paginate() query: PaginateQuery) {
+    return this.gendersService.getPage(query)
   }
 
   @Get(':id')

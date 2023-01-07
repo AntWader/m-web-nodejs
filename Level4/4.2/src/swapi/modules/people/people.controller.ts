@@ -4,8 +4,8 @@ import { CreatePersonDto } from '../../dto/create-person.dto';
 import { UpdatePersonDto } from '../../dto/update-person.dto';
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { ApiQuery } from '@nestjs/swagger';
-import { Roles } from 'src/auth/roles/roles.decorator';
-import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from '../../../auth/roles/roles.decorator';
+import { RolesGuard } from '../../../auth/roles/roles.guard';
 
 @UseGuards(RolesGuard)
 @Roles('admin')
