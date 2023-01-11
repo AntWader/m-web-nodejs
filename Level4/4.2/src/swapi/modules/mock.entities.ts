@@ -1,3 +1,9 @@
+import { CreateFilmDto } from "../dto/create-film.dto";
+import { CreatePersonDto } from "../dto/create-person.dto";
+import { CreatePlanetDto } from "../dto/create-planet.dto";
+import { CreateSpeciesDto } from "../dto/create-species.dto";
+import { CreateStarshipDto } from "../dto/create-starship.dto";
+import { CreateVehicleDto } from "../dto/create-vehicle.dto";
 import { Film } from "../entities/film.entity";
 import { Gender } from "../entities/gender.entity";
 import { Person } from "../entities/person.entity";
@@ -6,7 +12,7 @@ import { Species } from "../entities/species.entity";
 import { Starship } from "../entities/starship.entity";
 import { Vehicle } from "../entities/vehicle.entity";
 
-export const mockFilm: Film = {
+export const mockFilm: CreateFilmDto | { id: number } = {
     id: 0,
     title: "test",
     episode_id: 0,
@@ -24,9 +30,8 @@ export const mockFilm: Film = {
     url: ""
 }
 
-export const mockPerson: Partial<Person> = {
+export const mockPerson: CreatePersonDto | { id: number } = {
     id: 0,
-    images: [],
     name: "test",
     height: "test",
     mass: "test",
@@ -34,8 +39,8 @@ export const mockPerson: Partial<Person> = {
     skin_color: "test",
     eye_color: "test",
     birth_year: "test",
-    gender: { id: 0 } as Gender,
-    homeworld: { id: 0 } as Planet,
+    gender: 'gender',
+    homeworld: 'http',
     films: [],
     species: [],
     vehicles: [],
@@ -45,39 +50,39 @@ export const mockPerson: Partial<Person> = {
     url: ""
 }
 
-export const mockPlanet: Planet = {
+export const mockPlanet: CreatePlanetDto | { id: number } = {
     id: 0,
     name: "test",
-    rotation_period: "test",
-    orbital_period: "test",
-    diameter: "test",
+    rotation_period: 0,
+    orbital_period: 0,
+    diameter: 0,
     climate: "test",
     gravity: "test",
     terrain: "test",
-    surface_water: "test",
-    population: "test",
+    surface_water: 0,
+    population: 0,
     species: [],
     residents: [],
     films: [],
     created: new Date(),
     edited: new Date(),
-    url: ""
+    url: "http"
 }
 
-export const mockStarship: Starship = {
+export const mockStarship: CreateStarshipDto | { id: number } = {
     id: 0,
     name: "test",
     model: "test",
     manufacturer: "test",
-    cost_in_credits: "test",
-    length: "test",
-    max_atmosphering_speed: "test",
+    cost_in_credits: 0,
+    length: 0,
+    max_atmosphering_speed: 0,
     crew: "test",
-    passengers: "test",
-    cargo_capacity: "test",
+    passengers: 0,
+    cargo_capacity: 0,
     consumables: "test",
-    hyperdrive_rating: "test",
-    MGLT: "test",
+    hyperdrive_rating: 0,
+    MGLT: 0,
     starship_class: "test",
     pilots: [],
     films: [],
@@ -86,17 +91,17 @@ export const mockStarship: Starship = {
     url: ""
 }
 
-export const mockVehicle: Vehicle = {
+export const mockVehicle: CreateVehicleDto | { id: number } = {
     id: 0,
     name: "test",
     model: "test",
     manufacturer: "test",
-    cost_in_credits: "test",
-    length: "test",
-    max_atmosphering_speed: "test",
+    cost_in_credits: 0,
+    length: 0,
+    max_atmosphering_speed: 0,
     crew: "test",
-    passengers: "test",
-    cargo_capacity: "test",
+    passengers: 0,
+    cargo_capacity: 0,
     consumables: "test",
     vehicle_class: "test",
     pilots: [],
@@ -106,17 +111,17 @@ export const mockVehicle: Vehicle = {
     url: ""
 }
 
-export const mockSpecies: Species = {
+export const mockSpecies: CreateSpeciesDto | { id: number } = {
     id: 0,
     name: "test",
     classification: "test",
     designation: "test",
-    average_height: "test",
+    average_height: 0,
     skin_colors: "test",
     hair_colors: "test",
     eye_colors: "test",
-    average_lifespan: "test",
-    homeworld: { id: 0 } as Planet,
+    average_lifespan: 0,
+    homeworld: 'planet',
     language: "test",
     people: [],
     films: [],

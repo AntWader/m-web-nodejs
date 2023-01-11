@@ -44,7 +44,7 @@ describe('GendersService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of films', async () => {
+    it('should return an array of genders', async () => {
       expect(await service.findAll()).toEqual(
         expect.arrayContaining([expect.objectContaining(expectedGenderEntity)])
       );
@@ -56,7 +56,7 @@ describe('GendersService', () => {
   describe('findOne', () => {
     const id = 1;
 
-    it('should return a film', async () => {
+    it('should return a gender', async () => {
       expect(await service.findOne(id)).toEqual(expect.objectContaining(expectedGenderEntity));
     });
   });
@@ -65,7 +65,7 @@ describe('GendersService', () => {
     const id = 1;
     const updateDto = { gender: 'localhost' };
 
-    it('should return an updated film', async () => {
+    it('should return an updated gender', async () => {
       expect(await service.update(id, updateDto)).toEqual(
         expect.objectContaining({
           ...expectedGenderEntity,
@@ -78,7 +78,7 @@ describe('GendersService', () => {
   describe('remove', () => {
     const id = 1;
 
-    it('should return removed film', async () => {
+    it('should return removed gender', async () => {
       expect(await service.remove(id)).toEqual(
         expect.objectContaining(expectedGenderEntity)
       );

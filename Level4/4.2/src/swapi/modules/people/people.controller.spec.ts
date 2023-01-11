@@ -7,8 +7,8 @@ import { PeopleService } from './people.service';
 const expectedPersonEntity = {
   id: expect.any(Number),
   name: expect.any(String),
-  height: expect.any(Number),
-  mass: expect.any(Number),
+  height: expect.any(String),
+  mass: expect.any(String),
   hair_color: expect.any(String),
   skin_color: expect.any(String),
   eye_color: expect.any(String),
@@ -34,8 +34,8 @@ describe('PeopleController', () => {
         return {
           id: i,
           name: `name #${i}`,
-          height: 0,
-          mass: 0,
+          height: 'height',
+          mass: 'mass',
           hair_color: 'some color',
           skin_color: 'another some color',
           eye_color: 'and another one',
@@ -64,8 +64,8 @@ describe('PeopleController', () => {
   describe('create', () => {
     const entityDto: CreatePersonDto = {
       name: 'Name',
-      height: 0,
-      mass: 0,
+      height: 'height',
+      mass: 'mass',
       hair_color: 'color',
       skin_color: 'skin',
       eye_color: 'eye',

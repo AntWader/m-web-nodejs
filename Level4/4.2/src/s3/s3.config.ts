@@ -1,5 +1,5 @@
 import { S3 } from "aws-sdk";
-import { BUCKET_NAME, S3KEY, S3REGION, S3SECRETKEY, USER_NAME } from "src/s3/S3Key";
+import { BUCKET_NAME, S3KEY, S3REGION, S3SECRETKEY, USER_NAME } from "../s3/S3Key";
 
 export const s3ControllerPath = 's3/';
 

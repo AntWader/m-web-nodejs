@@ -5,10 +5,10 @@ export class CreatePersonDto {
     name: string;
 
     @ApiProperty()
-    height: number;
+    height: string;
 
     @ApiProperty()
-    mass: number;
+    mass: string;
 
     @ApiProperty()
     hair_color: string;

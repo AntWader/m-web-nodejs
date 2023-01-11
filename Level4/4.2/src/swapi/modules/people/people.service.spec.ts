@@ -16,8 +16,8 @@ import { PeopleService } from './people.service';
 const expectedPersonEntity = {
   id: expect.any(Number),
   name: expect.any(String),
-  height: expect.any(Number),
-  mass: expect.any(Number),
+  height: expect.any(String),
+  mass: expect.any(String),
   hair_color: expect.any(String),
   skin_color: expect.any(String),
   eye_color: expect.any(String),
@@ -46,11 +46,11 @@ describe('PeopleService', () => {
         },
         {
           provide: getRepositoryToken(Image),
-          useValue: new MockRepository(5, () => { return { id: 1, src: '' } }),
+          useValue: new MockRepository(5, () => { return { id: 0 } }),
         },
         {
           provide: getRepositoryToken(Gender),
-          useValue: new MockRepository(5, () => { return { id: 1, gender: '' } }),
+          useValue: new MockRepository(5, () => { return { id: 0 } }),
         },
         {
           provide: getRepositoryToken(Planet),
@@ -81,8 +81,8 @@ describe('PeopleService', () => {
   describe('create', () => {
     const entityDto: CreatePersonDto = {
       name: '',
-      height: 0,
-      mass: 0,
+      height: '',
+      mass: '',
       hair_color: '',
       skin_color: '',
       eye_color: '',
@@ -104,7 +104,7 @@ describe('PeopleService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of films', async () => {
+    it('should return an array of people', async () => {
       expect(await service.findAll()).toEqual(
         expect.arrayContaining([expect.objectContaining(expectedPersonEntity)])
       );
@@ -116,7 +116,7 @@ describe('PeopleService', () => {
   describe('findOne', () => {
     const id = 1;
 
-    it('should return a film', async () => {
+    it('should return a person', async () => {
       expect(await service.findOne(id)).toEqual(expect.objectContaining(expectedPersonEntity));
     });
   });
@@ -125,7 +125,7 @@ describe('PeopleService', () => {
     const id = 1;
     const updateDto = { url: 'localhost' };
 
-    it('should return an updated film', async () => {
+    it('should return an updated person', async () => {
       expect(await service.update(id, updateDto)).toEqual(
         expect.objectContaining({
           ...expectedPersonEntity,
@@ -138,7 +138,7 @@ describe('PeopleService', () => {
   describe('remove', () => {
     const id = 1;
 
-    it('should return removed film', async () => {
+    it('should return removed person', async () => {
       expect(await service.remove(id)).toEqual(
         expect.objectContaining(expectedPersonEntity)
       );
