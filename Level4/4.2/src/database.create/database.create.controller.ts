@@ -1,20 +1,20 @@
 import { Controller, Get, Req, UseGuards } from "@nestjs/common";
 import { Request as RequestType } from "express";
-import { Roles } from "src/auth/roles/roles.decorator";
-import { RolesGuard } from "src/auth/roles/roles.guard";
-import { ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from "src/router/router.config";
-import { CreateFilmDto } from "src/swapi/dto/create-film.dto";
-import { CreatePersonDto } from "src/swapi/dto/create-person.dto";
-import { CreatePlanetDto } from "src/swapi/dto/create-planet.dto";
-import { CreateSpeciesDto } from "src/swapi/dto/create-species.dto";
-import { CreateStarshipDto } from "src/swapi/dto/create-starship.dto";
-import { CreateVehicleDto } from "src/swapi/dto/create-vehicle.dto";
-import { FilmsService } from "src/swapi/modules/films/films.service";
-import { PeopleService } from "src/swapi/modules/people/people.service";
-import { PlanetsService } from "src/swapi/modules/planets/planets.service";
-import { SpeciesService } from "src/swapi/modules/species/species.service";
-import { StarshipsService } from "src/swapi/modules/starships/starships.service";
-import { VehiclesService } from "src/swapi/modules/vehicles/vehicles.service";
+import { Roles } from "../auth/roles/roles.decorator";
+import { RolesGuard } from "../auth/roles/roles.guard";
+import { ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from "../router/router.config";
+import { CreateFilmDto } from "../swapi/dto/create-film.dto";
+import { CreatePersonDto } from "../swapi/dto/create-person.dto";
+import { CreatePlanetDto } from "../swapi/dto/create-planet.dto";
+import { CreateSpeciesDto } from "../swapi/dto/create-species.dto";
+import { CreateStarshipDto } from "../swapi/dto/create-starship.dto";
+import { CreateVehicleDto } from "../swapi/dto/create-vehicle.dto";
+import { FilmsService } from "../swapi/modules/films/films.service";
+import { PeopleService } from "../swapi/modules/people/people.service";
+import { PlanetsService } from "../swapi/modules/planets/planets.service";
+import { SpeciesService } from "../swapi/modules/species/species.service";
+import { StarshipsService } from "../swapi/modules/starships/starships.service";
+import { VehiclesService } from "../swapi/modules/vehicles/vehicles.service";
 import { DatabaseCreateService, SWAPI_ENTITY_PATH } from "./database.create.service";
 
 @UseGuards(RolesGuard)

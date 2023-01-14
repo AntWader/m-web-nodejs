@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
 import { PeopleModule } from '../swapi/modules/people/people.module';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, RouterModule } from '@nestjs/core';
-import { ImagesModule } from 'src/swapi/modules/images/images.module';
-import { TransformInterceptor } from 'src/middleware/transform.interceptor';
-import { AuthModule } from 'src/auth/auth.module';
-import { HttpExceptionFilter } from 'src/filters/http-exception.filter';
-import { LoggingInterceptor } from 'src/middleware/logging.interceptor';
-import { SpeciesModule } from 'src/swapi/modules/species/species.module';
-import { PlanetsModule } from 'src/swapi/modules/planets/planets.module';
-import { StarshipsModule } from 'src/swapi/modules/starships/starships.module';
-import { VehiclesModule } from 'src/swapi/modules/vehicles/vehicles.module';
-import { FilmsModule } from 'src/swapi/modules/films/films.module';
-import { GendersModule } from 'src/swapi/modules/genders/genders.module';
-import { DatabaseCreateModule } from 'src/database.create/database.create.module';
+import { ImagesModule } from '../swapi/modules/images/images.module';
+import { TransformInterceptor } from '../middleware/transform.interceptor';
+import { AuthModule } from '../auth/auth.module';
+import { HttpExceptionFilter } from '../filters/http-exception.filter';
+import { LoggingInterceptor } from '../middleware/logging.interceptor';
+import { SpeciesModule } from '../swapi/modules/species/species.module';
+import { PlanetsModule } from '../swapi/modules/planets/planets.module';
+import { StarshipsModule } from '../swapi/modules/starships/starships.module';
+import { VehiclesModule } from '../swapi/modules/vehicles/vehicles.module';
+import { FilmsModule } from '../swapi/modules/films/films.module';
+import { GendersModule } from '../swapi/modules/genders/genders.module';
+import { DatabaseCreateModule } from '../database.create/database.create.module';
 import { ROUTER_AUTH_PATH, ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_GENDERS_PATH, ROUTER_IMAGES_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from './router.config';
 
 @Module({

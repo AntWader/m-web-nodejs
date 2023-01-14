@@ -2,8 +2,8 @@ import { Controller, Get, Param, Req, Res, StreamableFile, UseGuards } from "@ne
 import { s3ControllerPath } from "./s3.config";
 import { S3Service } from "./s3.service";
 import { Request as RequestType, Response as ResponseType } from 'express';
-import { RolesGuard } from "src/auth/roles/roles.guard";
-import { Roles } from "src/auth/roles/roles.decorator";
+import { RolesGuard } from "../auth/roles/roles.guard";
+import { Roles } from "../auth/roles/roles.decorator";
 
 @UseGuards(RolesGuard)
 @Roles('admin', 'user')
