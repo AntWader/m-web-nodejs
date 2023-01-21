@@ -112,7 +112,7 @@ describe('RouterController (e2e)', () => {
     });
 
     describe('POST test', () => {
-        it('/login (POST)', async () => {
+        it('/login (POST) should authorize with response status 201', async () => {
             const response = await request(app.getHttpServer())
                 .post('/login')
                 .send(authData)
@@ -129,20 +129,28 @@ describe('RouterController (e2e)', () => {
     })
 
     describe('GET test', () => {
-        it('/films (GET)', async () => {
+        it('/films (GET) should authorize with response status 200', async () => {
             const server = await app.getHttpServer()
 
             const response = await attachAuth(request(server).get('/films'), server, authData);
 
             expect(response.status).toEqual(200);
-            expect(response.body).toEqual({ data: {} });
+            expect(response.body).toEqual({ data: expect.any(Object) });
+        });
+
+        it('/films (GET) should response with forbidden status 403', async () => {
+            const server = await app.getHttpServer()
+
+            const response = await attachAuth(request(server).get('/films'), server, { username: '', password: '' });
+
+            expect(response.status).toEqual(403);
         });
     })
 
     async function attachAuth(req: request.Test, httpServer: any, auth: AuthType) {
         const getCookie = await request(httpServer).post('/login')
             .send(auth)
-        const cookies = getCookie.headers['set-cookie'].pop().split(';')[0];
+        const cookies = getCookie.headers['set-cookie']?.pop().split(';')[0];
 
         req.cookies = cookies;
         return req;
