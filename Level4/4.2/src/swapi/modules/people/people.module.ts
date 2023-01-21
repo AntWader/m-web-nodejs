@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { DynamicModule, Module } from "@nestjs/common";
 import { PeopleService } from "./people.service";
 import { PeopleController } from "./people.controller";
 import { DatabaseModule } from "../../../database/database.module";
@@ -12,9 +12,23 @@ import { Species } from "../../../swapi/entities/species.entity";
 import { Vehicle } from "../../../swapi/entities/vehicle.entity";
 import { Starship } from "../../../swapi/entities/starship.entity";
 
+// @Module({
+//   imports: [DatabaseModule, TypeOrmModule.forFeature([Person, Image, Gender, Planet, Film, Species, Vehicle, Starship])],
+//   controllers: [PeopleController],
+//   providers: [PeopleService]
+// })
+// export class PeopleModule { }
+
 @Module({
-  imports: [DatabaseModule, TypeOrmModule.forFeature([Person, Image, Gender, Planet, Film, Species, Vehicle, Starship])],
+  imports: [TypeOrmModule.forFeature([Person, Image, Gender, Planet, Film, Species, Vehicle, Starship])],
   controllers: [PeopleController],
   providers: [PeopleService]
 })
-export class PeopleModule { }
+export class PeopleModule {
+  static register(options: { db: any }): DynamicModule {
+    return {
+      module: PeopleModule,
+      imports: [options.db],
+    };
+  }
+}

@@ -15,7 +15,7 @@ import { PlanetsService } from "../swapi/modules/planets/planets.service";
 import { SpeciesService } from "../swapi/modules/species/species.service";
 import { StarshipsService } from "../swapi/modules/starships/starships.service";
 import { VehiclesService } from "../swapi/modules/vehicles/vehicles.service";
-import { DatabaseCreateService, SWAPI_ENTITY_PATH } from "./database.create.service";
+import { DatabaseCreateService, SWAPI_ENTITY_PATH } from "./swapi.create.service";
 
 @UseGuards(RolesGuard)
 @Roles('admin')

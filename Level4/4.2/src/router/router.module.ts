@@ -12,14 +12,19 @@ import { StarshipsModule } from '../swapi/modules/starships/starships.module';
 import { VehiclesModule } from '../swapi/modules/vehicles/vehicles.module';
 import { FilmsModule } from '../swapi/modules/films/films.module';
 import { GendersModule } from '../swapi/modules/genders/genders.module';
-import { DatabaseCreateModule } from '../database.create/database.create.module';
+import { DatabaseCreateModule } from '../swapi.create/swapi.create.module';
 import { ROUTER_AUTH_PATH, ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_GENDERS_PATH, ROUTER_IMAGES_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from './router.config';
+import { DatabaseModule } from 'src/database/database.module';
+import { TestDatabaseModule } from 'test/database';
+
+const db = DatabaseModule;
+// const db = TestDatabaseModule;
 
 @Module({
   imports: [
     AuthModule,
-    DatabaseCreateModule,
-    FilmsModule, PeopleModule, GendersModule, PlanetsModule, SpeciesModule, StarshipsModule, VehiclesModule, ImagesModule,
+    DatabaseCreateModule.register({ db: db }),
+    FilmsModule.register({ db: db }), PeopleModule.register({ db: db }), GendersModule.register({ db: db }), PlanetsModule.register({ db: db }), SpeciesModule.register({ db: db }), StarshipsModule.register({ db: db }), VehiclesModule.register({ db: db }), ImagesModule.register({ db: db }),
     RouterModule.register([
       {
         path: ROUTER_AUTH_PATH,

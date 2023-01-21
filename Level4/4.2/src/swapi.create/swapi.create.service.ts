@@ -5,7 +5,7 @@ export const SWAPI_ENTITY_PATH = 'uploads/swapi'
 
 @Injectable()
 export class DatabaseCreateService {
-    async readEntityArray(entityName: string): Promise<Record<string, any>[]> {
+    async readEntityArray(entityName: string, enyityPath?: string): Promise<Record<string, any>[]> {
         const entityPath = `${SWAPI_ENTITY_PATH}/swapi.${entityName}.json`
 
         const rawdata_people = await fs.readFile(entityPath, 'utf8');

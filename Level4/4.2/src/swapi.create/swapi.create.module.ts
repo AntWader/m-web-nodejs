@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { DynamicModule, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { DatabaseModule } from "../database/database.module";
 import { Film } from "../swapi/entities/film.entity";
@@ -15,19 +15,36 @@ import { PlanetsService } from "../swapi/modules/planets/planets.service";
 import { SpeciesService } from "../swapi/modules/species/species.service";
 import { StarshipsService } from "../swapi/modules/starships/starships.service";
 import { VehiclesService } from "../swapi/modules/vehicles/vehicles.service";
-import { DatabaseCreateController } from "./database.create.controller";
-import { DatabaseCreateService } from "./database.create.service";
+import { DatabaseCreateController } from "./swapi.create.controller";
+import { DatabaseCreateService } from "./swapi.create.service";
 
 /**
  * This module provides creating db data by requesting with GET method on it's controller root.
  * Data must be stored in .json files with each swapi entity data stored within directory SWAPI_ENTITY_PATH.
  */
+// @Module({
+//     imports: [DatabaseModule, TypeOrmModule.forFeature([Person, Image, Gender, Planet, Film, Species, Vehicle, Starship])],
+//     controllers: [DatabaseCreateController],
+//     providers: [
+//         DatabaseCreateService,
+//         FilmsService, PeopleService, PlanetsService, SpeciesService, StarshipsService, VehiclesService
+//     ]
+// })
+// export class DatabaseCreateModule { }
+
 @Module({
-    imports: [DatabaseModule, TypeOrmModule.forFeature([Person, Image, Gender, Planet, Film, Species, Vehicle, Starship])],
+    imports: [TypeOrmModule.forFeature([Person, Image, Gender, Planet, Film, Species, Vehicle, Starship])],
     controllers: [DatabaseCreateController],
     providers: [
         DatabaseCreateService,
         FilmsService, PeopleService, PlanetsService, SpeciesService, StarshipsService, VehiclesService
     ]
 })
-export class DatabaseCreateModule { }
+export class DatabaseCreateModule {
+    static register(options: { db: any, backupPath?: string }): DynamicModule {
+        return {
+            module: DatabaseCreateModule,
+            imports: [options.db],
+        };
+    }
+}

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { StarshipsService } from './starships.service';
 import { StarshipsController } from './starships.controller';
 import { DatabaseModule } from '../../../database/database.module';
@@ -7,9 +7,23 @@ import { Starship } from '../../../swapi/entities/starship.entity';
 import { Person } from '../../../swapi/entities/person.entity';
 import { Film } from '../../../swapi/entities/film.entity';
 
+// @Module({
+//   imports: [DatabaseModule, TypeOrmModule.forFeature([Starship, Person, Film])],
+//   controllers: [StarshipsController],
+//   providers: [StarshipsService]
+// })
+// export class StarshipsModule { }
+
 @Module({
-  imports: [DatabaseModule, TypeOrmModule.forFeature([Starship, Person, Film])],
+  imports: [TypeOrmModule.forFeature([Starship, Person, Film])],
   controllers: [StarshipsController],
   providers: [StarshipsService]
 })
-export class StarshipsModule { }
+export class StarshipsModule {
+  static register(options: { db: any }): DynamicModule {
+    return {
+      module: StarshipsModule,
+      imports: [options.db],
+    };
+  }
+}
