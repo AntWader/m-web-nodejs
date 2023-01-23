@@ -4,13 +4,6 @@ import { CreatePlanetDto } from "../dto/create-planet.dto";
 import { CreateSpeciesDto } from "../dto/create-species.dto";
 import { CreateStarshipDto } from "../dto/create-starship.dto";
 import { CreateVehicleDto } from "../dto/create-vehicle.dto";
-import { Film } from "../entities/film.entity";
-import { Gender } from "../entities/gender.entity";
-import { Person } from "../entities/person.entity";
-import { Planet } from "../entities/planet.entity";
-import { Species } from "../entities/species.entity";
-import { Starship } from "../entities/starship.entity";
-import { Vehicle } from "../entities/vehicle.entity";
 
 export const mockFilm: CreateFilmDto | { id: number } = {
     id: 0,

@@ -22,7 +22,8 @@ import { StarshipsModule } from '../src/swapi/modules/starships/starships.module
 import { VehiclesModule } from '../src/swapi/modules/vehicles/vehicles.module';
 
 type AuthType = { username: string, password: string };
-const authData: AuthType = { username: "user", password: "password" }
+const authUser: AuthType = { username: "user", password: "password" }
+const authAdmin: AuthType = { username: "admin", password: "admin" }
 
 const db = TestDatabaseModule;
 
@@ -33,7 +34,7 @@ describe('RouterController (e2e)', () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [
                 AuthModule,
-                DatabaseCreateModule.register({ db: db }),
+                DatabaseCreateModule.register({ db: db, backupPath: 'test/backup' }),
                 FilmsModule.register({ db: db }), PeopleModule.register({ db: db }), GendersModule.register({ db: db }), PlanetsModule.register({ db: db }), SpeciesModule.register({ db: db }), StarshipsModule.register({ db: db }), VehiclesModule.register({ db: db }), ImagesModule.register({ db: db }),
                 RouterModule.register([
                     {
@@ -111,28 +112,48 @@ describe('RouterController (e2e)', () => {
         await app.init();
     });
 
-    describe('POST test', () => {
+    describe('/login (POST) test', () => {
         it('/login (POST) should authorize with response status 201', async () => {
             const response = await request(app.getHttpServer())
                 .post('/login')
-                .send(authData)
+                .send(authUser)
 
             expect(response.status).toEqual(201);
             expect(response.body).toEqual({
                 data: {
                     userId: expect.any(Number),
-                    username: authData.username,
+                    username: authUser.username,
                     roles: expect.arrayContaining<string>([]),
                 }
             });
         });
     })
 
-    describe('GET test', () => {
-        it('/films (GET) should authorize with response status 200', async () => {
+    describe('/create (GET) test', () => {
+        it('/create (GET) should authorize and create db content from /backup', async () => {
             const server = await app.getHttpServer()
 
-            const response = await attachAuth(request(server).get('/films'), server, authData);
+            const response = await attachAuth(request(server).get('/create'), server, authAdmin);
+
+            expect(response.status).toEqual(200);
+            expect(response.body).toEqual({ data: expect.any(String) });
+        });
+    })
+
+    async function attachAuth(req: request.Test, httpServer: any, auth: AuthType) {
+        const getCookie = await request(httpServer).post('/login')
+            .send(auth)
+        const cookies = getCookie.headers['set-cookie']?.pop().split(';')[0];
+
+        req.cookies = cookies;
+        return req;
+    }
+
+    describe('/films (GET) test', () => {
+        it('/films (GET) should authorize and show all films', async () => {
+            const server = await app.getHttpServer()
+
+            const response = await attachAuth(request(server).get('/films'), server, authUser);
 
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({ data: expect.any(Object) });
@@ -146,14 +167,5 @@ describe('RouterController (e2e)', () => {
             expect(response.status).toEqual(403);
         });
     })
-
-    async function attachAuth(req: request.Test, httpServer: any, auth: AuthType) {
-        const getCookie = await request(httpServer).post('/login')
-            .send(auth)
-        const cookies = getCookie.headers['set-cookie']?.pop().split(';')[0];
-
-        req.cookies = cookies;
-        return req;
-    }
 
 });

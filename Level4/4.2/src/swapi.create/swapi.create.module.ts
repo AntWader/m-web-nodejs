@@ -36,7 +36,6 @@ import { DatabaseCreateService } from "./swapi.create.service";
     imports: [TypeOrmModule.forFeature([Person, Image, Gender, Planet, Film, Species, Vehicle, Starship])],
     controllers: [DatabaseCreateController],
     providers: [
-        DatabaseCreateService,
         FilmsService, PeopleService, PlanetsService, SpeciesService, StarshipsService, VehiclesService
     ]
 })
@@ -45,6 +44,13 @@ export class DatabaseCreateModule {
         return {
             module: DatabaseCreateModule,
             imports: [options.db],
+            providers: [
+                {
+                    provide: 'BACKUP_PATH',
+                    useValue: options.backupPath,
+                },
+                DatabaseCreateService
+            ]
         };
     }
 }

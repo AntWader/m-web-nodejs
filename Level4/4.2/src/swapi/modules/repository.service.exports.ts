@@ -17,8 +17,6 @@ export async function createEntity(
     dto: entityType,
     relations?: relationType[],
 ) {
-    //const filteredDto = filterUnknown(dto);
-
     let entityProperties: Partial<entityType>;
     let relationsProperties: Partial<entityType>;
 
