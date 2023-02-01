@@ -20,6 +20,7 @@ import { PlanetsModule } from '../src/swapi/modules/planets/planets.module';
 import { SpeciesModule } from '../src/swapi/modules/species/species.module';
 import { StarshipsModule } from '../src/swapi/modules/starships/starships.module';
 import { VehiclesModule } from '../src/swapi/modules/vehicles/vehicles.module';
+import { CreatePersonDto } from 'src/swapi/dto/create-person.dto';
 
 type AuthType = { username: string, password: string };
 const authUser: AuthType = { username: "user", password: "password" }
@@ -129,17 +130,32 @@ describe('RouterController (e2e)', () => {
         });
     })
 
+    // creates DB records if films table is empty
     describe('/create (GET) test', () => {
         it('/create (GET) should authorize and create db content from /backup', async () => {
             const server = await app.getHttpServer()
 
-            const response = await attachAuth(request(server).get('/create'), server, authAdmin);
+            // check if records already exists
+            const films = await attachAuth(request(server).get('/films'), server, authUser);
 
-            expect(response.status).toEqual(200);
-            expect(response.body).toEqual({ data: expect.any(String) });
+            // if films data don't exist, then other data tables also probably empty and need to be created...
+            if (films.body.data.length < 1) {
+                const response = await attachAuth(request(server).get('/create'), server, authAdmin);
+
+                expect(response.status).toEqual(200);
+                expect(response.body).toEqual({ data: expect.any(String) });
+            }
         });
     })
 
+    /**
+     * Get connect.sid=... cookie and adds it to request.
+     * 
+     * @param req request
+     * @param httpServer yourApp.getHttpServer()
+     * @param auth { username: "username", password: "password" }
+     * @returns request with attached cookie
+     */
     async function attachAuth(req: request.Test, httpServer: any, auth: AuthType) {
         const getCookie = await request(httpServer).post('/login')
             .send(auth)
@@ -149,23 +165,77 @@ describe('RouterController (e2e)', () => {
         return req;
     }
 
-    describe('/films (GET) test', () => {
-        it('/films (GET) should authorize and show all films', async () => {
+    describe('/people (GET) test', () => {
+        it('/people (GET) should authorize and show all people', async () => {
             const server = await app.getHttpServer()
 
-            const response = await attachAuth(request(server).get('/films'), server, authUser);
+            const response = await attachAuth(request(server).get('/people'), server, authUser);
+
+            //console.log(response.request.url)
 
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({ data: expect.any(Object) });
         });
 
-        it('/films (GET) should response with forbidden status 403', async () => {
+        it('/people (GET) should response with forbidden status 403', async () => {
             const server = await app.getHttpServer()
 
-            const response = await attachAuth(request(server).get('/films'), server, { username: '', password: '' });
+            const response = await attachAuth(request(server).get('/people'), server, { username: '', password: '' });
+
+            //console.log(response.originalUrl)
 
             expect(response.status).toEqual(403);
         });
     })
 
+    describe('/people (POST) test', () => {
+        const testPerson: CreatePersonDto = {
+            "name": "Test Skywalker",
+            "height": "172",
+            "mass": "77",
+            "hair_color": "blond",
+            "skin_color": "fair",
+            "eye_color": "blue",
+            "birth_year": "19BBY",
+            "gender": "male",
+            "homeworld": { id: 1 },
+            "films": [
+                { "id": 1 }
+            ],
+            "species": [
+                { "id": 1 }
+            ],
+            "vehicles": [
+                { "id": 1 }
+            ],
+            "starships": [
+                { "id": 1 }
+            ],
+            "created": new Date('2014-12-09T13:50:51.644000Z'),
+            "edited": new Date('2014-12-20T21:17:56.891000Z'),
+            "url": "https://testurl/people/1/"
+        }
+
+        it('/people (POST) add new person', async () => {
+            const server = await app.getHttpServer()
+
+            const response = await attachAuth(request(server).post('/people').send(testPerson), server, authAdmin);
+
+            expect(response.status).toEqual(201);
+            expect(response.body).toEqual({ data: expect.any(Object) });
+        });
+    })
+
+    describe('/people (PATCH) test', () => {
+        const patched = { "url": "https://new/people/1/" };
+
+        it('/people (PATCH) should change test person', async () => {
+            const server = await app.getHttpServer()
+
+            const response = await attachAuth(request(server).patch('/people/1').send(patched), server, authAdmin);
+
+            expect(response.status).toEqual(200);
+            expect(response.body).toEqual({ data: expect.objectContaining(patched) });
+        });
+    })
 });

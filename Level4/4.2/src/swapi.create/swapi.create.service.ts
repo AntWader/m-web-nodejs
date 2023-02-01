@@ -8,10 +8,7 @@ export class DatabaseCreateService {
     constructor(@Inject('BACKUP_PATH') private backupPath: string | undefined) { }
 
     async readEntityArray(entityName: string): Promise<Record<string, any>[]> {
-        // change path if backupPath was specified
-        const path = this.backupPath ? this.backupPath : SWAPI_ENTITY_PATH;
-
-        const entityPath = `${path}/swapi.${entityName}.json`
+        const entityPath = `${this.backupPath}/swapi.${entityName}.json`
 
         const rawdata_people = await fs.readFile(entityPath, 'utf8');
         const peopleData = JSON.parse(rawdata_people);

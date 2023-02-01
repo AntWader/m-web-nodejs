@@ -40,7 +40,7 @@ import { DatabaseCreateService } from "./swapi.create.service";
     ]
 })
 export class DatabaseCreateModule {
-    static register(options: { db: any, backupPath?: string }): DynamicModule {
+    static register(options: { db: any, backupPath: string }): DynamicModule {
         return {
             module: DatabaseCreateModule,
             imports: [options.db],

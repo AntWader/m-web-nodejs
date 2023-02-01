@@ -20,11 +20,12 @@ import { TestDatabaseModule } from 'test/database';
 const db = DatabaseModule;
 // const db = TestDatabaseModule;
 // const path = 'test/backup';
+const SWAPI_ENTITY_PATH = 'uploads/swapi'
 
 @Module({
   imports: [
     AuthModule,
-    DatabaseCreateModule.register({ db: db }),
+    DatabaseCreateModule.register({ db: db, backupPath: SWAPI_ENTITY_PATH }),
     FilmsModule.register({ db: db }), PeopleModule.register({ db: db }), GendersModule.register({ db: db }), PlanetsModule.register({ db: db }), SpeciesModule.register({ db: db }), StarshipsModule.register({ db: db }), VehiclesModule.register({ db: db }), ImagesModule.register({ db: db }),
     RouterModule.register([
       {
@@ -79,10 +80,10 @@ const db = DatabaseModule;
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: HttpExceptionFilter,
+    // },
   ],
 })
 export class ApiRouterModule { }
