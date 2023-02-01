@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { PeopleModule } from '../swapi/modules/people/people.module';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, RouterModule } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE, RouterModule } from '@nestjs/core';
 import { ImagesModule } from '../swapi/modules/images/images.module';
 import { TransformInterceptor } from '../middleware/transform.interceptor';
 import { AuthModule } from '../auth/auth.module';
@@ -80,10 +80,14 @@ const SWAPI_ENTITY_PATH = 'uploads/swapi'
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: HttpExceptionFilter,
-    // },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe
+    }
   ],
 })
 export class ApiRouterModule { }

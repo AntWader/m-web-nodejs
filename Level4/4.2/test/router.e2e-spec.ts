@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { DatabaseModule } from '../src/database/database.module';
 import { TestDatabaseModule } from './database';
 import * as session from 'express-session';
 import * as passport from 'passport';
-import { RouterModule, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { RouterModule, APP_INTERCEPTOR, APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AuthModule } from '../src/auth/auth.module';
 import { HttpExceptionFilter } from '../src/filters/http-exception.filter';
 import { LoggingInterceptor } from '../src/middleware/logging.interceptor';
@@ -94,6 +94,10 @@ describe('RouterController (e2e)', () => {
                     provide: APP_FILTER,
                     useClass: HttpExceptionFilter,
                 },
+                {
+                    provide: APP_PIPE,
+                    useClass: ValidationPipe
+                }
             ],
         }).overrideProvider(DatabaseModule).useValue(TestDatabaseModule).compile();
 
@@ -227,15 +231,37 @@ describe('RouterController (e2e)', () => {
     })
 
     describe('/people (PATCH) test', () => {
-        const patched = { "url": "https://new/people/1/" };
+        const patched = { url: "https://new/people/1/" };
 
-        it('/people (PATCH) should change test person', async () => {
+        it('/people (PATCH) should change first person', async () => {
             const server = await app.getHttpServer()
 
-            const response = await attachAuth(request(server).patch('/people/1').send(patched), server, authAdmin);
+            const people = await attachAuth(request(server).get('/people'), server, authUser);
+            const patchId: number = people.body.data[0].id;
+
+            const response = await attachAuth(request(server).patch(`/people/${patchId}`).send(patched), server, authAdmin);
 
             expect(response.status).toEqual(200);
             expect(response.body).toEqual({ data: expect.objectContaining(patched) });
+        });
+    })
+
+    describe('/people (DELETE) test', () => {
+        it('/people (DELETE) should delete first person', async () => {
+            const server = await app.getHttpServer()
+
+            const people = await attachAuth(request(server).get('/people'), server, authUser);
+            const length = people.body.data.length;
+            const deleteId: number = people.body.data[0].id;
+
+            const response = await attachAuth(request(server).delete(`/people/${deleteId}`), server, authAdmin);
+            console.log(response.body)
+
+            expect(response.status).toEqual(200);
+
+            const newPeople = await attachAuth(request(server).get('/people'), server, authUser);
+
+            expect(newPeople.body.data.length).toEqual(length - 1);
         });
     })
 });
