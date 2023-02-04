@@ -17,19 +17,19 @@ export const test_db: MysqlConnectionOptions = {
 }
 
 /**
- * This module provides access to database (db).
- */
-@Module({
-    imports: [TypeOrmModule.forRoot(test_db)],
-    exports: [TypeOrmModule.forRoot(test_db)],
-})
-export class TestDatabaseModule { }
-
-/**
- * This module provides access to database (db).
+ * This module provides access to test database.
  */
 // @Module({
-//     imports: [TypeOrmModule.forRoot(antwader4nestjsDbConfig)],
-//     exports: [TypeOrmModule.forRoot(antwader4nestjsDbConfig)],
+//     imports: [TypeOrmModule.forRoot(test_db)],
+//     exports: [TypeOrmModule.forRoot(test_db)],
 // })
 // export class TestDatabaseModule { }
+
+/**
+ * This module provides access to cloud test database.
+ */
+@Module({
+    imports: [TypeOrmModule.forRoot(antwader4nestjsDbConfig)],
+    exports: [TypeOrmModule.forRoot(antwader4nestjsDbConfig)],
+})
+export class TestDatabaseModule { }
