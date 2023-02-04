@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { antwader4nestjsDbConfig } from "../src/database/database.config";
 import { MysqlConnectionOptions } from "typeorm/driver/mysql/MysqlConnectionOptions";
 
 export const test_db: MysqlConnectionOptions = {
@@ -23,3 +24,12 @@ export const test_db: MysqlConnectionOptions = {
     exports: [TypeOrmModule.forRoot(test_db)],
 })
 export class TestDatabaseModule { }
+
+/**
+ * This module provides access to database (db).
+ */
+// @Module({
+//     imports: [TypeOrmModule.forRoot(antwader4nestjsDbConfig)],
+//     exports: [TypeOrmModule.forRoot(antwader4nestjsDbConfig)],
+// })
+// export class TestDatabaseModule { }

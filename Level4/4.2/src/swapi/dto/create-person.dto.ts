@@ -6,10 +6,6 @@ export class IsEntityOrString implements ValidatorConstraintInterface {
     validate(text: any, args: ValidationArguments) {
         return typeof text === 'string' || typeof text.id === 'number';
     }
-
-    defaultMessage(args: ValidationArguments) {
-        return '($value) must be {id: number} or string';
-    }
 }
 
 @ValidatorConstraint({ name: 'entity-array-or-string-array', async: false })

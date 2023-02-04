@@ -10,7 +10,7 @@ import { AuthModule } from '../src/auth/auth.module';
 import { HttpExceptionFilter } from '../src/filters/http-exception.filter';
 import { LoggingInterceptor } from '../src/middleware/logging.interceptor';
 import { TransformInterceptor } from '../src/middleware/transform.interceptor';
-import { ROUTER_AUTH_PATH, ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_PEOPLE_PATH, ROUTER_GENDERS_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH, ROUTER_IMAGES_PATH } from '../src/router/router.config';
+import { ROUTER_AUTH_PATH, ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_PEOPLE_PATH, ROUTER_GENDERS_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH, ROUTER_IMAGES_PATH } from '../src/router/router.module';
 import { DatabaseCreateModule } from '../src/swapi.create/swapi.create.module';
 import { FilmsModule } from '../src/swapi/modules/films/films.module';
 import { GendersModule } from '../src/swapi/modules/genders/genders.module';
@@ -237,7 +237,7 @@ describe('RouterController (e2e)', () => {
             const server = await app.getHttpServer()
 
             const people = await attachAuth(request(server).get('/people'), server, authUser);
-            const patchId: number = people.body.data[0].id;
+            const patchId: number = people.body.data[people.body.data.length - 1].id;
 
             const response = await attachAuth(request(server).patch(`/people/${patchId}`).send(patched), server, authAdmin);
 
@@ -252,7 +252,7 @@ describe('RouterController (e2e)', () => {
 
             const people = await attachAuth(request(server).get('/people'), server, authUser);
             const length = people.body.data.length;
-            const deleteId: number = people.body.data[0].id;
+            const deleteId: number = people.body.data[people.body.data.length - 1].id;
 
             const response = await attachAuth(request(server).delete(`/people/${deleteId}`), server, authAdmin);
             console.log(response.body)

@@ -1,8 +1,8 @@
-import { Controller, Get, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Inject, Req, UseGuards } from "@nestjs/common";
 import { Request as RequestType } from "express";
 import { Roles } from "../auth/roles/roles.decorator";
 import { RolesGuard } from "../auth/roles/roles.guard";
-import { ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from "../router/router.config";
+import { ROUTER_FILMS_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from "../router/router.module";
 import { CreateFilmDto } from "../swapi/dto/create-film.dto";
 import { CreatePersonDto } from "../swapi/dto/create-person.dto";
 import { CreatePlanetDto } from "../swapi/dto/create-planet.dto";
@@ -15,13 +15,14 @@ import { PlanetsService } from "../swapi/modules/planets/planets.service";
 import { SpeciesService } from "../swapi/modules/species/species.service";
 import { StarshipsService } from "../swapi/modules/starships/starships.service";
 import { VehiclesService } from "../swapi/modules/vehicles/vehicles.service";
-import { DatabaseCreateService, SWAPI_ENTITY_PATH } from "./swapi.create.service";
+import { DatabaseCreateService } from "./swapi.create.service";
 
 @UseGuards(RolesGuard)
 @Roles('admin')
 @Controller()
 export class DatabaseCreateController {
     constructor(
+        @Inject('BACKUP_PATH') private backupPath: string,
         private readonly databaseCreateService: DatabaseCreateService,
         private readonly filmsService: FilmsService,
         private readonly peopleService: PeopleService,
@@ -34,7 +35,7 @@ export class DatabaseCreateController {
     @Get()
     async getFile(@Req() req: RequestType) {
         // generate console massage about request
-        process.stdout.write(` -> attempt to read entities data from ${SWAPI_ENTITY_PATH} (in project root)`);
+        process.stdout.write(` -> attempt to read entities data from ${this.backupPath} (in project root)`);
 
         // FIRST create entities
         const films: CreateFilmDto[] = await this.databaseCreateService.readEntityArray('films') as CreateFilmDto[];

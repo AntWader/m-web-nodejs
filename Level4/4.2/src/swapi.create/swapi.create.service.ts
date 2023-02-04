@@ -1,11 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import * as fs from 'fs/promises';
 
-export const SWAPI_ENTITY_PATH = 'uploads/swapi'
-
 @Injectable()
 export class DatabaseCreateService {
-    constructor(@Inject('BACKUP_PATH') private backupPath: string | undefined) { }
+    constructor(@Inject('BACKUP_PATH') private backupPath: string ) { }
 
     async readEntityArray(entityName: string): Promise<Record<string, any>[]> {
         const entityPath = `${this.backupPath}/swapi.${entityName}.json`

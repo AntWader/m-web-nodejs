@@ -13,14 +13,24 @@ import { VehiclesModule } from '../swapi/modules/vehicles/vehicles.module';
 import { FilmsModule } from '../swapi/modules/films/films.module';
 import { GendersModule } from '../swapi/modules/genders/genders.module';
 import { DatabaseCreateModule } from '../swapi.create/swapi.create.module';
-import { ROUTER_AUTH_PATH, ROUTER_CREATE_DB_PATH, ROUTER_FILMS_PATH, ROUTER_GENDERS_PATH, ROUTER_IMAGES_PATH, ROUTER_PEOPLE_PATH, ROUTER_PLANETS_PATH, ROUTER_SPECIES_PATH, ROUTER_STARSHIPS_PATH, ROUTER_VEHICLES_PATH } from './router.config';
-import { DatabaseModule } from 'src/database/database.module';
+import { DatabaseModule } from '../database/database.module';
 import { TestDatabaseModule } from 'test/database';
 
 const db = DatabaseModule;
 // const db = TestDatabaseModule;
 // const path = 'test/backup';
-const SWAPI_ENTITY_PATH = 'uploads/swapi'
+export const SWAPI_ENTITY_PATH = 'uploads/swapi'
+
+export const ROUTER_AUTH_PATH = 'login';
+export const ROUTER_CREATE_DB_PATH = 'create';
+export const ROUTER_FILMS_PATH = 'films';
+export const ROUTER_PEOPLE_PATH = 'people';
+export const ROUTER_GENDERS_PATH = 'genders';
+export const ROUTER_PLANETS_PATH = 'planets';
+export const ROUTER_SPECIES_PATH = 'species';
+export const ROUTER_STARSHIPS_PATH = 'starships';
+export const ROUTER_VEHICLES_PATH = 'vehicles';
+export const ROUTER_IMAGES_PATH = 'img/people';
 
 @Module({
   imports: [
@@ -76,10 +86,10 @@ const SWAPI_ENTITY_PATH = 'uploads/swapi'
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
     },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: LoggingInterceptor,
+    // },
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
