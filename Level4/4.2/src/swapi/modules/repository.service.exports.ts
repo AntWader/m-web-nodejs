@@ -273,6 +273,10 @@ export async function findAllEntities(repository: repositoryType, config?: relat
         return result.map(entity => flatten(entity, config));
     }
 
+    // if (config) {
+    //     return result.map(entity => entity);
+    // }
+
     return result;
 }
 

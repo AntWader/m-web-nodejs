@@ -1,0 +1,1 @@
+sudo certbot --nginx -d antwader.online -d www.antwader.online
