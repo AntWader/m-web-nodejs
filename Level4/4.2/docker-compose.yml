@@ -1,0 +1,56 @@
+version: '3'
+services:
+  web:
+    depends_on:
+      - db
+    container_name: swapi.web
+    build: .
+    ports:
+      - "3000:3000"
+    # environment:
+    #   - DB_HOST=db
+    #   - DB_USER=root
+    #   - DB_PASSWORD=root
+    #   - DB_NAME=mysql
+    #   - DB_PORT=3306
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 256M
+
+  db:
+    container_name: swapi.mysql
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - swapi-mysql:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 0M
+  
+  webserver:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/conf/:/etc/nginx/ssl/:ro
+  
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+
+volumes:
+  swapi-mysql:
+    driver: local

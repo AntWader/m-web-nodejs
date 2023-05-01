@@ -25,3 +25,16 @@ export const nest4jsDbConfig: MysqlConnectionOptions = {
     ],
     synchronize: true,
 }
+
+export const dockerDb: MysqlConnectionOptions = {
+    type: 'mysql',
+    host: 'db',
+    port: 3306,
+    username: 'root',
+    password: 'root',
+    database: 'mysql',
+    entities: [
+        __dirname + '/../**/*.entity{.ts,.js}',
+    ],
+    synchronize: true,
+}

@@ -1,1 +1,5 @@
 sudo certbot --nginx -d antwader.online -d www.antwader.online
+
+docker compose run --rm certbot certonly --webroot --dry-run -d antwader.online -d www.antwader.online
+
+docker compose run --rm certbot certonly -d antwader.online -d www.antwader.online
